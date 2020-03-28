@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>TP4 Nicolas Wallet</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="styles.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+
+
+	</head>
+	<body>
+
+
+    <form id="log" class="position-absolute col-lg-2">
+      <div class="form-group">
+        <label for="pseudo">Pseudo</label>
+        <input type="text" class="form-control" id="pseudo">
+      </div>
+      <div class="form-group">
+        <label for="clr">Couleur</label>
+        <input type="color" class="form-control" id="clr">
+      </div>
+      <button type="submit" class="btn btn-primary">Rejoindre</button>
+    </form>
+
+
+    <div class="gui">
+        <!-- Button trigger modal -->
+<button type="button" class="btn btn-sm btn-block btn-light help" data-toggle="modal" data-target="#Modal_help">
+  Aide <i class="ri-question-line"></i>
+
+</button>
+
+      <p>Liste des joueurs :</p>
+      <ul id="list_user">
+      </ul>
+    </div>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="Modal_help" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Aide</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Touches directionnelles pour controller la voiture<br>
+        <i class="ri-arrow-up-s-line"></i> Avancer <br>
+        <i class="ri-arrow-down-s-line"></i> Reculer <br>
+        <i class="ri-arrow-left-s-line"></i> Gauche <br>
+        <i class="ri-arrow-right-s-line"></i> Droite <br>
+
+
+
+        'A' pour changer la caméra
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+		<script src="three.js-dev/three.js"></script>
+
+		<script src="three.js-dev/MTLLoader.js"></script>
+		<script src="three.js-dev/OBJLoader.js"></script>
+		<script src="sketch.js"></script>
+
+	</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "vroom",
+  "version": "1.0.0",
+  "description": "Threejs & Socket.io App",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Nicolas Wallet",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.2",
+    "socket.io": "^1.7.4"
+  }
+}

@@ -1,0 +1,8 @@
+body { margin: 0; }
+canvas { display: block; }
+
+form { background-color: white;}
+
+.gui {position: absolute;right: 0px; background-color: rgba(0, 0, 0, 0.4);color: white;padding: 10px;}
+
+.help{ }
