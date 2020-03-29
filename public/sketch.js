@@ -4,7 +4,7 @@ var car = new THREE.Object3D();
 var other = []
 var size_grid = 100;
 var divisions = 10;
-var cam1 = false;
+var cam = 1;
 let mov = {};
 let f = true;
 
@@ -58,31 +58,6 @@ car.position.x=45;
 car.rotation.y-=1.57
 car.add(camera)
 scene.add(car)
-
-/*
-var MTLLoader = new THREE.MTLLoader( );
-
-MTLLoader.load( 'ressources/Low_Poly_Sportcar.mtl', 
-	function (materials) {
-		materials.preload();
-		var OBJLoader = new THREE.OBJLoader( );
-		OBJLoader.setMaterials( materials );
-		OBJLoader.load( 'ressources/Low_Poly_Sportcar.obj',
-			function (object) {
-				object.getObjectByName('Disc').visible = false
-				object.getObjectByName("Car").material[1].color.set(0xe74e4e)
-				object.scale.set( 0.01, 0.01, 0.01);
-				other.add(object);
-			}
-		);
-	}
-);
-
-
-other.position.y=1;
-other.position.x=45;
-other.rotation.y-=1.57
-scene.add(other)*/
 
 	// On remplie Geomtry de triangle , on créer deux par deux pour avoir un carré
 	var geometry = new THREE.Geometry();
@@ -156,22 +131,26 @@ Si  c'est un touche 1 ou 2 on repositionne la caméra
 
 */
 
-document.addEventListener('keydown', (event) => {
+init_control = () => document.addEventListener('keydown', (event) => {
 	mov[event.code]= true
 
-	//Camera
-	if (event.code === 'KeyQ') {
-		if(cam1)
-		{
-			camera.position.x = -30;
-			camera.position.y = 20;
+		//Camera
+		if (event.code === 'KeyQ') {
+			if(cam == 0)
+			{
+				camera.position.x = -30;
+				camera.position.y = 20;
+			}
+			else if(cam == 1){
+				camera.position.x = 1.15;
+				camera.position.y = 2;
+			}
+			else{
+				camera.position.x = 4;
+				camera.position.y = 1;
+			}
+			cam= (cam+1)%3;
 		}
-		else{
-			camera.position.x = 1.15;
-			camera.position.y = 2;
-		}
-		cam1=!cam1;
-	}
  });
 
 
@@ -257,7 +236,6 @@ scene.add(tmp)
 
 
 /* LOG */
-
 document.querySelector('#log').addEventListener('submit', event => {
 	event.preventDefault();
 	socket=io();
@@ -265,10 +243,10 @@ document.querySelector('#log').addEventListener('submit', event => {
 	socket.emit('player', pseudo.value,clr.value.replace('#','0x'))
 
 	socket.on('new', (id,name,color)=>{
-		console.log('J\'ai reçu un joueur'+id);
 		if(f){
 			init(color);
 			animate()
+			init_control();
 			f=false;
 		}
 		else{
@@ -279,7 +257,7 @@ document.querySelector('#log').addEventListener('submit', event => {
 		li.id='user_'+id
 		li.style = "color:"+color.replace("0x",'#')
 		document.querySelector('#list_user').appendChild(li);
-
+		document.querySelector('#gui').classList = 'gui';
 	;
 	}) 
 
@@ -287,9 +265,7 @@ document.querySelector('#log').addEventListener('submit', event => {
 		scene.remove(scene.getObjectByName(id));
 		document.querySelector('#user_'+id).remove();
 	  })
-
-	document.querySelector('#log').remove();
-
+	document.querySelector('.container').remove();
   })
 
 
