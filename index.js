@@ -17,7 +17,6 @@ let player=[];
 
 io.on('connection', function(socket){
 
-  console.log(socket)
   socket.on('player', (name,color) =>{
    
     io.emit('new', socket.id,name,color);

@@ -22,29 +22,27 @@ function init(color=0x000000) {
 	//Scene
 	scene = new THREE.Scene();
 
-	var light = new THREE.PointLight(0xeeeeee);
-	light.position.set(0, 50, 0);
-	scene.add(light);
 	
-	var lightAmb = new THREE.AmbientLight(0xff77ff);
+	
+	var lightAmb = new THREE.AmbientLight(0xffffff);
 	scene.add(lightAmb);
 
 
 	// car 
 
 
-
-var MTLLoader = new THREE.MTLLoader( );
+var MTLLoader = new THREE.MTLLoader();
 
 MTLLoader.load( 'ressources/Low_Poly_Sportcar.mtl', 
 	function (materials) {
 		materials.preload();
-		var OBJLoader = new THREE.OBJLoader( );
+		materials.materials.Car_MAt.color.set( parseInt(colord) )
+		console.log(materials)
+		var OBJLoader = new THREE.OBJLoader();
 		OBJLoader.setMaterials( materials );
 		OBJLoader.load( 'ressources/Low_Poly_Sportcar.obj',
 			function (object) {
 				object.getObjectByName('Disc').visible = false
-				object.getObjectByName("Car").material[1].color= new THREE.Color( parseInt(colord) )
 				object.scale.set( 0.01, 0.01, 0.01);
 				car.add(object);
 			}
@@ -110,10 +108,11 @@ scene.add(car)
 	
 	}
 
-
 	// Ajoute le Damier
 	material = new THREE.MeshBasicMaterial({ vertexColors: THREE.VertexColors });
 	scene.add(new THREE.Mesh(geometry , material))
+
+
 
 	//render
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -167,8 +166,8 @@ function animate() {
 			car.position.x -= Math.cos(-car.rotation.y); 
 		}
 		if(  mov['ArrowUp'] && isCorrect(car.position,car.rotation,1) ){
-			car.position.z += isCorrect(car.position,car.rotation,1) ==true ? Math.sin(-car.rotation.y) : 0 ; 
-			car.position.x += isCorrect(car.position,car.rotation,1) ==true ? Math.cos(-car.rotation.y) : 0 ; ; 
+			car.position.z += Math.sin(-car.rotation.y) ; 
+			car.position.x += Math.cos(-car.rotation.y) ; 
 		}
 		
 		if( mov['ArrowLeft']){
