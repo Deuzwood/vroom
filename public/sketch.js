@@ -37,7 +37,6 @@ MTLLoader.load( 'ressources/Low_Poly_Sportcar.mtl',
 	function (materials) {
 		materials.preload();
 		materials.materials.Car_MAt.color.set( parseInt(colord) )
-		console.log(materials)
 		var OBJLoader = new THREE.OBJLoader();
 		OBJLoader.setMaterials( materials );
 		OBJLoader.load( 'ressources/Low_Poly_Sportcar.obj',
@@ -56,6 +55,7 @@ car.position.x=45;
 car.rotation.y-=1.57
 car.add(camera)
 scene.add(car)
+scene.background = new THREE.Color(0x444444)
 
 	// On remplie Geomtry de triangle , on créer deux par deux pour avoir un carré
 	var geometry = new THREE.Geometry();
@@ -113,6 +113,8 @@ scene.add(car)
 	scene.add(new THREE.Mesh(geometry , material))
 
 
+	road_render(50,30,100)
+	road_render(50,130,100)
 
 	//render
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -268,3 +270,43 @@ document.querySelector('#log').addEventListener('submit', event => {
   })
 
 
+
+function road_render(x,y,length,rot=0){
+	let road = new THREE.Object3D();
+	const w = 12;
+
+	/* side */ 
+	var geometry = new THREE.BoxGeometry( 1, 1, length )
+	material = new THREE.MeshBasicMaterial({ color:0x777777 });
+	let side = new THREE.Mesh(geometry , material)
+	road.add(side)
+
+	let side2 = new THREE.Mesh(geometry , material);
+	side2.position.x+=w
+	road.add(side2)
+
+	/* ground */
+	geometry = new THREE.PlaneGeometry( w, length )
+	material = new THREE.MeshBasicMaterial({ color:0x222222});
+	let ground = new THREE.Mesh(geometry , material)
+	ground.position.x+=w/2
+	ground.rotation.x= THREE.Math.degToRad(-90);
+	road.add(ground)
+
+	/** line */
+	for(i=0;i<length;i+=10){
+
+		geometry = new THREE.PlaneGeometry( 0.8, 6 )
+		material = new THREE.MeshBasicMaterial({ color:0xffffff});
+		let ground = new THREE.Mesh(geometry , material)
+		ground.position.y+=0.01
+		ground.position.x+=w/2
+		ground.position.z+=i-length/2+6
+		ground.rotation.x= THREE.Math.degToRad(-90);
+		road.add(ground)
+	}
+
+	road.position.set(x,0,y)
+	road.rotation.y=THREE.Math.degToRad(rot*90)
+	scene.add(road)
+}
