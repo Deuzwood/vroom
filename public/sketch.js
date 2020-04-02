@@ -113,8 +113,10 @@ scene.background = new THREE.Color(0x444444)
 	scene.add(new THREE.Mesh(geometry , material))
 
 
-	road_render(50,30,100)
-	road_render(50,130,100)
+	road_render(60,30,100)
+	intersect_render(60,-70,[0,1,1,0])
+	road_render(10,-20,100,1)
+	/*road_render(50,130,100)*/
 
 	//render
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -306,7 +308,94 @@ function road_render(x,y,length,rot=0){
 		road.add(ground)
 	}
 
-	road.position.set(x,0,y)
+	road.position.set(x,0,y-length/2)
 	road.rotation.y=THREE.Math.degToRad(rot*90)
+	scene.add(road)
+}
+
+function intersect_render(x,y,open){
+	let road = new THREE.Object3D();
+	const w = 12;
+
+	/* side */ 
+	/*var geometry = new THREE.BoxGeometry( 1, 1, length )
+	material = new THREE.MeshBasicMaterial({ color:0x777777 });
+	let side = new THREE.Mesh(geometry , material)
+	road.add(side)*/
+
+	/*let side2 = new THREE.Mesh(geometry , material);
+	side2.position.x+=w
+	road.add(side2)*/
+
+	open.forEach( (element,index) => {
+		console.log(index)
+		let side,geometry,material;
+		if(element){
+			geometry = new THREE.BoxGeometry( 1, 1, w )
+			material = new THREE.MeshBasicMaterial({ color:0x777777 });
+			side = new THREE.Mesh(geometry , material)
+
+			line = new THREE.Mesh( new THREE.PlaneGeometry(0.8 , 3) , new THREE.MeshBasicMaterial( {color : 0xffffff }))
+		}
+
+		if(element && index==0){
+			side.position.set(0,0,0)
+
+			line.rotation.x+=THREE.Math.degToRad(90);
+		}
+		if(element && index==1){
+			side.position.set(w/2,0,-w/2)
+			side.rotation.y+= THREE.Math.degToRad(90)
+
+			line.rotation.x+=THREE.Math.degToRad(180);
+			
+		}
+		if(element && index==2){
+			side.position.set(w,0,0)
+
+			line.rotation.x= THREE.Math.degToRad(-90)
+			
+		}
+		if(element && index==3){
+			side.position.set(w/2,0,w/2)
+			side.rotation.y+= THREE.Math.degToRad(90)
+
+
+			line.rotation.x= THREE.Math.degToRad(90)
+		}
+	
+		if(element){
+			line.rotation.x= THREE.Math.degToRad(-90);
+			line.position.set(w/2,0.01,w/2-3)
+			road.add(side)
+			road.add(line)		
+		}
+			
+
+	});
+
+	/* ground */
+	geometry = new THREE.PlaneGeometry( w, w )
+	material = new THREE.MeshBasicMaterial({ color:0x222222, side:THREE.DoubleSide});
+	let ground = new THREE.Mesh(geometry , material)
+	ground.position.x+=w/2
+	ground.rotation.x= THREE.Math.degToRad(-90);
+	road.add(ground)
+
+	/** line */
+	/*for(i=0;i<length;i+=10){
+
+		geometry = new THREE.PlaneGeometry( 0.8, 6 )
+		material = new THREE.MeshBasicMaterial({ color:0xffffff});
+		let ground = new THREE.Mesh(geometry , material)
+		ground.position.y+=0.01
+		ground.position.x+=w/2
+		ground.position.z+=i-length/2+6
+		ground.rotation.x= THREE.Math.degToRad(-90);
+		road.add(ground)
+	}*/
+
+	road.position.set(x,0,y-w/2)
+	
 	scene.add(road)
 }
