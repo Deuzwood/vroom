@@ -13,6 +13,23 @@ app.get('/', function(req, res){
 });
 
 
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+var routes = require('./routes/router');
+app.use('/', routes);
+//app.use('/users', users);
+
+/// catch 404 and forwarding to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+
 let player=[];
 
 io.on('connection', function(socket){

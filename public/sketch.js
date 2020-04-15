@@ -7,9 +7,9 @@ var divisions = 10;
 var cam = 1;
 let mov = {};
 let f = true;
-
+let speed = 0;
 var socket;
-
+let item = true;
 
 function init(color=0x000000) {
 	let colord = color
@@ -49,12 +49,14 @@ MTLLoader.load( 'ressources/Low_Poly_Sportcar.mtl',
 	}
 );
 
+
 car.name = "self"
 car.position.y=1;
 car.position.x=45;
 car.rotation.y-=1.57
 car.add(camera)
 scene.add(car)
+
 scene.background = new THREE.Color(0x444444)
 
 	// On remplie Geomtry de triangle , on créer deux par deux pour avoir un carré
@@ -113,10 +115,12 @@ scene.background = new THREE.Color(0x444444)
 	scene.add(new THREE.Mesh(geometry , material))
 
 
-	road_render(60,30,100)
+	/*road_render(60,30,100)
 	intersect_render(60,-70,[0,1,1,0])
-	road_render(10,-20,100,1)
+	road_render(10,-20,100,1)*/
 	/*road_render(50,130,100)*/
+
+	create_object(-30,45)
 
 	//render
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -154,7 +158,11 @@ init_control = () => document.addEventListener('keydown', (event) => {
 			}
 			cam= (cam+1)%3;
 		}
- });
+		
+		
+
+	
+	});
 
 
  document.addEventListener('keyup', (event) => {
@@ -162,17 +170,38 @@ init_control = () => document.addEventListener('keydown', (event) => {
  });
 
 
+ let cg=0;
+
 function animate() {
 	requestAnimationFrame( animate );
 	renderer.render( scene, camera );
+	if(isPool(car.position)){
+		car.rotation.z-=0.02;
+		car.position.y-=0.02;
+
+
+		if(car.rotation.z<-0.8)
+			respawn();
+	}else{
 		if( mov['ArrowDown'] && isCorrect(car.position,car.rotation,-1)){
-			car.position.z -= Math.sin(-car.rotation.y); 
-			car.position.x -= Math.cos(-car.rotation.y); 
+			if(speed<=0){
+				car.position.z += speed*Math.sin(-car.rotation.y); 
+				car.position.x += speed*Math.cos(-car.rotation.y); 
+			}
+
+
+			
+			speed= speed-0.05>-0.3 ? speed-0.02 : speed
 		}
-		if(  mov['ArrowUp'] && isCorrect(car.position,car.rotation,1) ){
-			car.position.z += Math.sin(-car.rotation.y) ; 
-			car.position.x += Math.cos(-car.rotation.y) ; 
-		}
+			
+		if(  (mov['ArrowUp']|| speed!=0) && isCorrect(car.position,car.rotation,1)  ){
+			if(mov['ArrowUp'])
+				speed+=0.02;
+			car.position.z += speed*Math.sin(-car.rotation.y) ; 
+			car.position.x += speed*Math.cos(-car.rotation.y) ; 
+			
+		}else if(!isCorrect(car.position,car.rotation,1) ){speed=0}
+			
 		
 		if( mov['ArrowLeft']){
 			car.rotation.y+=0.06
@@ -180,7 +209,35 @@ function animate() {
 			
 		if( mov['ArrowRight'] ){
 			car.rotation.y-=0.06
-		}	
+		}
+
+		/**Perte de vitesse  */
+		if(!mov['ArrowUp'] && speed>0)
+			speed= speed-0.01>0 ? speed-0.01 : 0
+		if(!mov['ArrowUp'] && speed<0)
+			speed= speed-0.01<0 ? speed+0.01 : 0
+
+		stats(mov['ArrowUp']);
+
+	}
+
+		touch_cube();
+
+if(mine)
+	if(touch_mine()){
+		speed=0;
+		scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array.forEach( (element,index) => { scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array[index] = element*(1+Math.random())})
+		scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.needsUpdate = true;
+		if(scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array[0]>100 || scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array[0]=='-Infinity')
+			respawn();
+	}
+
+
+	
+	if( mov['KeyX'] && item){
+		trigger_item()
+		item = false;
+	}
 
 		socket.emit('move',car.position.x,car.position.z,car.rotation.y)
 		socket.on('move' , (id,x,z,r_y) => { 
@@ -201,7 +258,8 @@ function isCorrect(position,rot,pas){
 	pos = new THREE.Vector3(position.x,position.y,position.z);
 	pos.z += pas*Math.sin(-rot.y); 
 	pos.x += pas*Math.cos(-rot.y); 
-	return !((pos.z>50 || pos.z<-50) || (pos.x>50 || pos.x<-50)) && ((pos.z>40 || pos.z<-40) || (pos.x>40 || pos.x<-40))
+	return !((pos.z>50 || pos.z<-50) || (pos.x>50 || pos.x<-50))
+	//return !((pos.z>50 || pos.z<-50) || (pos.x>50 || pos.x<-50)) && ((pos.z>40 || pos.z<-40) || (pos.x>40 || pos.x<-40))
 }
 
 
@@ -235,6 +293,25 @@ scene.add(tmp)
 
 }
 
+function isPool(position){
+	pos = new THREE.Vector3(position.x,position.y,position.z);
+	return  !((pos.z>40 || pos.z<-40) || (pos.x>40 || pos.x<-40))
+}
+function respawn(){
+	car.position.y=1;
+	car.position.x=45;
+	car.position.z=0
+	car.rotation.y=-1.57;
+	car.rotation.z=0;
+	car.rotation.x=0;
+
+	//reset checkpoint
+	checkpoints=[0,0]
+	
+	//reset speed
+	speed=0
+}
+
 
 
 
@@ -261,6 +338,8 @@ document.querySelector('#log').addEventListener('submit', event => {
 		li.style = "color:"+color.replace("0x",'#')
 		document.querySelector('#list_user').appendChild(li);
 		document.querySelector('#gui').classList = 'gui';
+		document.querySelector('#stats').classList = 'stats';
+		document.querySelector('#main_gui').classList = '';
 	;
 	}) 
 
@@ -273,129 +352,129 @@ document.querySelector('#log').addEventListener('submit', event => {
 
 
 
-function road_render(x,y,length,rot=0){
-	let road = new THREE.Object3D();
-	const w = 12;
 
-	/* side */ 
-	var geometry = new THREE.BoxGeometry( 1, 1, length )
-	material = new THREE.MeshBasicMaterial({ color:0x777777 });
-	let side = new THREE.Mesh(geometry , material)
-	road.add(side)
 
-	let side2 = new THREE.Mesh(geometry , material);
-	side2.position.x+=w
-	road.add(side2)
+/**
+ * On actualise nos stats
+ * Ici pas de Dat.gui que du js 
+ * On pourra modifier notre gui plus simplement
+ *
+ */
+let inc=0;
+let checkpoints = [0,0]
+let times = [];
+let clock = new THREE.Clock();
+clock.start();
+function stats(up){
+	inc++;
+	if(up)
+		document.querySelector('#inc').innerText = parseInt(document.querySelector('#inc').innerText)+1
 
-	/* ground */
-	geometry = new THREE.PlaneGeometry( w, length )
-	material = new THREE.MeshBasicMaterial({ color:0x222222});
-	let ground = new THREE.Mesh(geometry , material)
-	ground.position.x+=w/2
-	ground.rotation.x= THREE.Math.degToRad(-90);
-	road.add(ground)
+	document.querySelector('#speed').innerText = (speed*50).toFixed(0)
 
-	/** line */
-	for(i=0;i<length;i+=10){
+	//checkpoints, à chaque coin , a met le checkpoints à 1 pour etre sur qu'il ne fait pas demi tour.
+	//45,1,0 -> position de départ
 
-		geometry = new THREE.PlaneGeometry( 0.8, 6 )
-		material = new THREE.MeshBasicMaterial({ color:0xffffff});
-		let ground = new THREE.Mesh(geometry , material)
-		ground.position.y+=0.01
-		ground.position.x+=w/2
-		ground.position.z+=i-length/2+6
-		ground.rotation.x= THREE.Math.degToRad(-90);
-		road.add(ground)
+	//check 1
+	if(car.position.x<50 && car.position.x>40 && car.position.z>-10 && car.position.z<10){
+		checkpoints[0]=1
+		clock.start
 	}
 
-	road.position.set(x,0,y-length/2)
-	road.rotation.y=THREE.Math.degToRad(rot*90)
-	scene.add(road)
+	//check 2
+	if(car.position.x<-40 && car.position.x>-50 && car.position.z>0 && car.position.z<10){
+		checkpoints[1]=1
+	}
+
+	// si deux checkpoint && on est de retour au premier
+	if(checkpoints.indexOf(0) == -1 && car.position.x<50 && car.position.x>40 && car.position.z>-10 && car.position.z<10)//Si  tout les checkpoints sont passé , alors on a bien fait un tour
+	{
+		checkpoints = [0,0]
+		let last = clock.getDelta().toFixed(2)
+
+		document.querySelector('#nbtour').innerText = parseInt(document.querySelector('#nbtour').innerText)+1
+		document.querySelector('#last_time').innerText = last+' sec';
+		times.push(last)
+		document.querySelector('#best_time').innerText = Math.min(...times)
+	}
+		
+
 }
 
-function intersect_render(x,y,open){
-	let road = new THREE.Object3D();
-	const w = 12;
-
-	/* side */ 
-	/*var geometry = new THREE.BoxGeometry( 1, 1, length )
-	material = new THREE.MeshBasicMaterial({ color:0x777777 });
-	let side = new THREE.Mesh(geometry , material)
-	road.add(side)*/
-
-	/*let side2 = new THREE.Mesh(geometry , material);
-	side2.position.x+=w
-	road.add(side2)*/
-
-	open.forEach( (element,index) => {
-		console.log(index)
-		let side,geometry,material;
-		if(element){
-			geometry = new THREE.BoxGeometry( 1, 1, w )
-			material = new THREE.MeshBasicMaterial({ color:0x777777 });
-			side = new THREE.Mesh(geometry , material)
-
-			line = new THREE.Mesh( new THREE.PlaneGeometry(0.8 , 3) , new THREE.MeshBasicMaterial( {color : 0xffffff }))
-		}
-
-		if(element && index==0){
-			side.position.set(0,0,0)
-
-			line.rotation.x+=THREE.Math.degToRad(90);
-		}
-		if(element && index==1){
-			side.position.set(w/2,0,-w/2)
-			side.rotation.y+= THREE.Math.degToRad(90)
-
-			line.rotation.x+=THREE.Math.degToRad(180);
-			
-		}
-		if(element && index==2){
-			side.position.set(w,0,0)
-
-			line.rotation.x= THREE.Math.degToRad(-90)
-			
-		}
-		if(element && index==3){
-			side.position.set(w/2,0,w/2)
-			side.rotation.y+= THREE.Math.degToRad(90)
 
 
-			line.rotation.x= THREE.Math.degToRad(90)
-		}
+
+let box = new THREE.Group();
+box.name='box';
+function create_object(x,y){
+	let geometry = new THREE.BoxGeometry(3,3,3)
+	let material = new THREE.MeshBasicMaterial( { color:0xffffff})
+
+	let obj = new THREE.Mesh( geometry , material)
 	
-		if(element){
-			line.rotation.x= THREE.Math.degToRad(-90);
-			line.position.set(w/2,0.01,w/2-3)
-			road.add(side)
-			road.add(line)		
+	obj.rotation.y=THREE.Math.degToRad(45)
+	obj.rotation.x=THREE.Math.degToRad(45)
+	box.add(obj)
+	box.position.set(x,3.5,y)
+	scene.add(box)
+}
+
+
+
+let drop = [ 'Mine']
+let actual_item
+function touch_cube(){
+		if(car.position.distanceTo(box.position)<3.5){
+			box.visible=false
+			box.position.set(999,999,999)
+			//todo delete render object
+
+			//Pick one item
+			const random = drop[Math.floor(Math.random() * drop.length)];
+			console.log(random)
+			document.querySelector('#item').innerText = random
+			actual_item = random
 		}
 			
+}
 
-	});
 
-	/* ground */
-	geometry = new THREE.PlaneGeometry( w, w )
-	material = new THREE.MeshBasicMaterial({ color:0x222222, side:THREE.DoubleSide});
-	let ground = new THREE.Mesh(geometry , material)
-	ground.position.x+=w/2
-	ground.rotation.x= THREE.Math.degToRad(-90);
-	road.add(ground)
+/* Green 
+/* Champipi
+/* banana
+*/
+let it = new THREE.Group();
+let mine=false;
+function trigger_item(){
+	console.log('triggered')
+	if(actual_item === 'Mine'){
+		mine=true;
+		it.name='item_mine';
+		let geometry = new THREE.CylinderGeometry(2,2,0.3,32)
+		let material = new THREE.MeshBasicMaterial( { color:0x000000})
+		let obj = new THREE.Mesh( geometry , material)
 
-	/** line */
-	/*for(i=0;i<length;i+=10){
+		 geometry = new THREE.CylinderGeometry(0.8,0.8,0.1,8)
+		 material = new THREE.MeshBasicMaterial( { color:0xff0000})
+		let pop = new THREE.Mesh( geometry , material)
+		pop.position.y+=0.3
 
-		geometry = new THREE.PlaneGeometry( 0.8, 6 )
-		material = new THREE.MeshBasicMaterial({ color:0xffffff});
-		let ground = new THREE.Mesh(geometry , material)
-		ground.position.y+=0.01
-		ground.position.x+=w/2
-		ground.position.z+=i-length/2+6
-		ground.rotation.x= THREE.Math.degToRad(-90);
-		road.add(ground)
-	}*/
+		it.add(obj)
+		it.add(pop)
+		it.position.set(car.position.x,car.position.y,car.position.z) 
+		scene.add(it)
+	}
 
-	road.position.set(x,0,y-w/2)
-	
-	scene.add(road)
+
+	document.querySelector('#item').innerText = '';
+}
+
+
+function touch_mine(){
+	if(car.position.distanceTo(it.position)<3.5){
+		it.visible=false
+		//it.position.set(999,999,999)
+	return true;
+	}
+		
 }

@@ -1,0 +1,19 @@
+exports.index = function(req, res) {
+  res.render('layout_map',{ path: 'empty',script : '' });
+};
+
+exports.map = function(req, res) {
+    res.render('layout_map',{ path: 'empty',script : 'map_script' });
+  };
+
+exports.circuit_1 = function(req, res) {
+  res.render('layout_map' ,{path: 'empty', script : 'map1'});
+}
+
+exports.mine = function(req, res) {
+  res.render('layout_map' ,{path: 'empty', script : 'mine'});
+}
+
+exports.editor = function(req, res) {
+  res.render('terminal' );
+}

@@ -1,0 +1,38 @@
+body{
+    padding: 0px;
+    margin: 0px;
+}
+
+
+
+.parent {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    }
+    
+.nav { 
+    grid-area: 1 / 1 / 6 / 2;
+    margin: 20px;
+}
+.div2 { grid-area: 1 / 2 / 2 / 3; }
+
+a{
+    display: block;
+    text-decoration: none;
+    color: grey;
+    font-family: "Lucida Console", monospace;
+    font-size: 18px;
+    letter-spacing: 1.4px;
+    color: #777777;
+    font-weight: 800;
+    text-decoration: none solid rgb(68, 68, 68);
+    font-variant: small-caps;
+    text-transform: capitalize;
+    padding-left: 20px;
+}
+a:visited{
+    color: grey;
+}

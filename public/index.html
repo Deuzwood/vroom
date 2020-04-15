@@ -12,7 +12,8 @@
 	</head>
 	<body>
     <div class="container">
-      <h1>ThreeJS (TP4 IG) + Socket.io</h1>
+      <h1>TP - Informatique Graphique</h1>
+      <h2>ThreeJS + Socket.io</h2>
 
       <form id="log" class=" col-lg-2">
         <div class="form-group">
@@ -30,11 +31,21 @@
 
 
 
+    <div id="stats" class="stats d-none">
+			Inc : <span class="r" id="inc">0</span> <br>
+			Nombre de tour : <span class="r" id="nbtour">0</span> <br>
+      Dernier tour : <span class="r" id="last_time">Aucun</span><br>
+      Meilleur tour : <span class="r" id="best_time">Aucun</span>
+		</div>
     
-
+  <div id="main_gui" class="d-none">
+    <span id="speed"></span>
+    <span id="item"></span>
+  </div>
 
     <div id='gui' class="gui d-none">
-        <!-- Button trigger modal -->
+      
+      
 <button type="button" class="btn btn-sm btn-block btn-light help" data-toggle="modal" data-target="#Modal_help">
   Aide <i class="ri-question-line"></i>
 
@@ -87,7 +98,8 @@
 		<script src="three.js-dev/three.js"></script>
 
 		<script src="three.js-dev/MTLLoader.js"></script>
-		<script src="three.js-dev/OBJLoader.js"></script>
+    <script src="three.js-dev/OBJLoader.js"></script>
+    
     <script src="sketch.js"></script>
 
 	</body>
