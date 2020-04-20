@@ -6,30 +6,31 @@
     <body>
 
         <div class="parent">
-            <div class="nav"> <%- include('inc/nav') %> </div>
+            <div class="nav"><canvas id="debug-canvas" width="25" height="25"></canvas> <%- include('inc/nav') %> </div>
             <div class="div2" id="frame"> </div>
         </div>
 
         <%- include(`${path}`); %>
         
         
-        <script src="../three.js-dev/three.js"></script>
-        <script src="../three.js-dev/OrbitControls.js"></script>
-        <script src="../js/stats.js"></script>
+        <script src="/three.js-dev/three.js"></script>
+        <script src="/three.js-dev/OrbitControls.js"></script>
+        <script src="/js/stats.js"></script>
 
-        <script src="../js/init_map.js"></script>
-        <script src="../js/Segment.js"></script>
-        <script src="../js/Map.js"></script>
+        <script src="/js/init_map.js"></script>
+        <script src="/js/Segment.js"></script>
+        <script src="/js/Map.js"></script>
+
         <script type="module">
-            import * as env from '../js/Environnement.js'; 
+            import * as env from '/js/Environnement.js'; 
 
 
-            scene.add(env.lampadaire(10,10));
+           /*scene.add(env.lampadaire(10,10));
             scene.add(env.lampadaire(40,10));
             scene.add(env.lampadaire(70,10));
-            scene.add(env.lampadaire(100,10));
+            scene.add(env.lampadaire(100,10));*/
 
         </script>
-        <script src="../js/<%= script %>.js"></script>
+        <script src="/js/<%= script %>.js"></script>
     </body>
 </html>
