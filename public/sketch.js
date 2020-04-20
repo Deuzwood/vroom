@@ -10,8 +10,9 @@ let f = true;
 let speed = 0;
 var socket;
 let item = true;
+var keyBinding = {forward: "ArrowUp",backward: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", camera: "KeyQ"}
 
-function init(color=0x000000) {
+function init(color=0x000000,map_name) {
 	let colord = color
 	//Camera
 	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 300 );
@@ -60,7 +61,7 @@ scene.add(car)
 scene.background = new THREE.Color(0x444444)
 
 	// On remplie Geomtry de triangle , on créer deux par deux pour avoir un carré
-	var geometry = new THREE.Geometry();
+	/*var geometry = new THREE.Geometry();
 	for (let x = -50; x < 50; x+=10) {
 		for (let z = -50; z < 50; z+=10) {
 			
@@ -74,11 +75,11 @@ scene.background = new THREE.Color(0x444444)
 			geometry.vertices.push(new THREE.Vector3( x+10, 0, z+10 ))
 			
 		}
-	}
+	}*/
 
 
 	//On en créé des faces pour les colorer
-	let x=0,y=0
+	/*let x=0,y=0
 	for(let i=0;i<600;i+=6){
 		
 		//On prend la couleur en fct des coordonnées
@@ -108,17 +109,17 @@ scene.background = new THREE.Color(0x444444)
 			y++
 		}
 	
-	}
+	}*/
 
 	// Ajoute le Damier
-	material = new THREE.MeshBasicMaterial({ vertexColors: THREE.VertexColors });
-	scene.add(new THREE.Mesh(geometry , material))
+	/*material = new THREE.MeshBasicMaterial({ vertexColors: THREE.VertexColors });
+	scene.add(new THREE.Mesh(geometry , material))*/
 
-
-	/*road_render(60,30,100)
-	intersect_render(60,-70,[0,1,1,0])
-	road_render(10,-20,100,1)*/
-	/*road_render(50,130,100)*/
+	console.log(map_name)
+	if(map_name=="server1"){
+		console.log("render server1")
+		circuit_1.render()
+	}
 
 	create_object(-30,45)
 
@@ -175,15 +176,15 @@ init_control = () => document.addEventListener('keydown', (event) => {
 function animate() {
 	requestAnimationFrame( animate );
 	renderer.render( scene, camera );
-	if(isPool(car.position)){
+	/*if(isPool(car.position)){
 		car.rotation.z-=0.02;
 		car.position.y-=0.02;
 
 
 		if(car.rotation.z<-0.8)
 			respawn();
-	}else{
-		if( mov['ArrowDown'] && isCorrect(car.position,car.rotation,-1)){
+	}else{*/
+		if( mov['ArrowDown'] /*&& isCorrect(car.position,car.rotation,-1)*/){
 			if(speed<=0){
 				car.position.z += speed*Math.sin(-car.rotation.y); 
 				car.position.x += speed*Math.cos(-car.rotation.y); 
@@ -194,7 +195,7 @@ function animate() {
 			speed= speed-0.05>-0.3 ? speed-0.02 : speed
 		}
 			
-		if(  (mov['ArrowUp']|| speed!=0) && isCorrect(car.position,car.rotation,1)  ){
+		if(  (mov['ArrowUp']|| speed!=0)/* && isCorrect(car.position,car.rotation,1) */ ){
 			if(mov['ArrowUp'])
 				speed+=0.02;
 			car.position.z += speed*Math.sin(-car.rotation.y) ; 
@@ -204,11 +205,11 @@ function animate() {
 			
 		
 		if( mov['ArrowLeft']){
-			car.rotation.y+=0.06
+			car.rotation.y+=0.05
 		}
 			
 		if( mov['ArrowRight'] ){
-			car.rotation.y-=0.06
+			car.rotation.y-=0.05
 		}
 
 		/**Perte de vitesse  */
@@ -219,7 +220,7 @@ function animate() {
 
 		stats(mov['ArrowUp']);
 
-	}
+	//}
 
 		touch_cube();
 
@@ -318,36 +319,43 @@ function respawn(){
 /* LOG */
 document.querySelector('#log').addEventListener('submit', event => {
 	event.preventDefault();
-	socket=io();
 
-	socket.emit('player', pseudo.value,clr.value.replace('#','0x'))
+	let server =document.querySelector('.card.border-success').id
 
-	socket.on('new', (id,name,color)=>{
-		if(f){
-			init(color);
-			animate()
-			init_control();
-			f=false;
-		}
-		else{
-			newCar(id,color)
-		}
-		let li = document.createElement('li')
-		li.textContent = name
-		li.id='user_'+id
-		li.style = "color:"+color.replace("0x",'#')
-		document.querySelector('#list_user').appendChild(li);
-		document.querySelector('#gui').classList = 'gui';
-		document.querySelector('#stats').classList = 'stats';
-		document.querySelector('#main_gui').classList = '';
-	;
-	}) 
+		socket=io();
+		socket.emit('player', pseudo.value,clr.value.replace('#','0x'),server)
+		socket.on('cl', m => console.log(m))
+		//socket.emit('player', pseudo.value,clr.value.replace('#','0x'))
 
-	socket.on('remove' , id => {
-		scene.remove(scene.getObjectByName(id));
-		document.querySelector('#user_'+id).remove();
-	  })
-	document.querySelector('.container').remove();
+		socket.on('new', (id,name,color)=>{
+			if(f){
+				console.log('i init here')
+				init(color,server);
+				animate()
+				init_control();
+				f=false;
+			}
+			else{
+				newCar(id,color)
+			}
+			let li = document.createElement('li')
+			li.textContent = name
+			li.id='user_'+id
+			li.style = "color:"+color.replace("0x",'#')
+			document.querySelector('#list_user').appendChild(li);
+			document.querySelector('#gui').classList = 'gui';
+			document.querySelector('#stats').classList = 'stats';
+			document.querySelector('#main_gui').classList = '';
+		;
+		}) 
+	
+		socket.on('remove' , id => {
+			scene.remove(scene.getObjectByName(id));
+			document.querySelector('#user_'+id).remove();
+		  })
+		document.querySelector('.container').remove();
+	
+	
   })
 
 

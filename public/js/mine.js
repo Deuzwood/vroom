@@ -18,18 +18,15 @@ scene.add(a);
 
 camera.position.set(10,10,10)
 
-let t =new THREE.clock()
+let t =new THREE.Clock()
+t.getDelta()
 function animate(t) {
     t *= 0.001;
     t = t.toFixed(0)
-    requestAnimationFrame( animate );
-    controls.update();
-    if(t%2==0){
-        scene.getObjectByName('item_mine').getObjectByName('pop').material = new THREE.MeshBasicMaterial({color:0xff9900})
-       
-    }
-    if(t%2==1)
-        scene.getObjectByName('item_mine').getObjectByName('pop').material = new THREE.MeshBasicMaterial({color:0xff0000})
     
+    controls.update();
+
+     scene.getObjectByName('item_mine').getObjectByName('pop').material.color.r = Math.sin(t)
+    requestAnimationFrame( animate );
 	render();
 }

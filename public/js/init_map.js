@@ -9,6 +9,7 @@ var controls;
 var stats = new Stats();
 
 
+
 init();
 animate();
 
@@ -16,11 +17,9 @@ function init() {
 
 	//Camera
 	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
-	camera.position.z = 0;
-	camera.position.y=200;
-	camera.lookAt( 0, 0, 0 );
-
-
+	camera.position.x = -100;
+    camera.position.y=150;
+    
 	//Scene
     scene = new THREE.Scene();
     
