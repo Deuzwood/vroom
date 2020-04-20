@@ -83,6 +83,7 @@ class Segment {
         scene.add(road)
 	}
 	
+	
 	render_i(){
 		let road = new THREE.Object3D();
 		const w = 12;
@@ -145,6 +146,9 @@ class Segment {
 		scene.add(road)
 	}
 
+	/**
+	 * 
+	 */
 	render_c(){
 		let curve = new THREE.Object3D();
 
@@ -172,9 +176,9 @@ class Segment {
 		if(this.size!=1){
 			var shape = new THREE.Shape();
 			shape.moveTo(0, 12);
-			shape.quadraticCurveTo((this.size-1)*12, (this.size-1)*12, (this.size-1)*12, 0);
-			shape.lineTo((this.size-1)*12-1, 0);
-			shape.quadraticCurveTo((this.size-1)*12-1,(this.size-1)*12-1, 0, (this.size-1)*12-1);
+			shape.quadraticCurveTo((this.size-1)*12, 12, (this.size-1)*12,(this.size)*12);
+			shape.lineTo((this.size-1)*12-1,(this.size)*12);
+			shape.quadraticCurveTo((this.size-1)*12-1,12+1,0,12+1);
 			var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:0x777777 }));
 	
@@ -186,16 +190,16 @@ class Segment {
 			amount : 0,
 			steps : 1,
 			bevelEnabled: false,
-			curveSegments: 150
+			curveSegments: 10*this.size
 		};
 		
 		/* Line */
 		if(this.size!=1){
 			var shape = new THREE.Shape();
-			shape.moveTo(+6, (this.size-1)*12+6);
-			shape.quadraticCurveTo((this.size-1)*12+6, (this.size-1)*12+6, (this.size-1)*12+6, +6);
-			shape.lineTo((this.size-1)*12+6-1, +6);
-			shape.quadraticCurveTo((this.size-1)*12+6-1,(this.size-1)*12+6-1, +6, (this.size-1)*12+6-1);
+			shape.moveTo(0, 6-0.4);
+			shape.quadraticCurveTo(this.size*12-6+0.4, 0+6-0.4, this.size*12-6+0.4, this.size*12);
+			shape.lineTo((this.size-1)*12+6-0.4,(this.size)*12);
+			shape.quadraticCurveTo((this.size-1)*12+6-0.4, 12-6+0.4, 0,12-6+0.4);
 			var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:0xffffff }));
 			mesh.position.z+=0.01
@@ -204,10 +208,10 @@ class Segment {
 
 		/* ground */
 		var shape = new THREE.Shape();
-		shape.moveTo(0, this.size*12);
-		shape.quadraticCurveTo(this.size*12, this.size*12, this.size*12, 0);
-		shape.lineTo((this.size-1)*12, 0);
-		shape.quadraticCurveTo((this.size-1)*12,(this.size-1)*12, 0,(this.size-1)*12);           
+		shape.moveTo(0, 0);
+		shape.quadraticCurveTo(this.size*12, 0, this.size*12, this.size*12);
+		shape.lineTo((this.size-1)*12,(this.size)*12);
+		shape.quadraticCurveTo((this.size-1)*12, 12, 0,12);           
 
 		
 
@@ -215,12 +219,42 @@ class Segment {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:0x222222 }));
 		curve.add( mesh );
 
-		console.log('align is '+this.align)
+
 		curve.rotation.x-=THREE.Math.degToRad(90)
 		curve.name = 'curve'+this.from.x+','+this.from.y+','+this.from.z
+		//curve.name="TEST"
+		curve.position.z+=6.5
+
+		if(this.side=='r'){
+			curve.position.z+=(this.size-1)*12-0.5+6
+			curve.position.x+=-(this.size-1)*12+0.5-6
+			let c = new THREE.Object3D();
+			c.name = 'curveR'+this.from.x+','+this.from.y+','+this.from.z
+			c.add(curve)
+			c.rotation.y+=THREE.Math.degToRad(90);
+			c.position.z+=+this.size*6
+			c.position.x+=+this.size*6
+			scene.add(c)
+		}
+
+		//scene.add(curve)
+		//scene.getObjectByName( 'curve'+this.from.x+','+this.from.y+','+this.from.z).position.set(this.from.x,this.from.y,this.from.z);
 
 
-		scene.add(curve)
+		let t = new THREE.Object3D();
+		t.name = 'curveT'+this.from.x+','+this.from.y+','+this.from.z
+		t.add(curve)
+
+		
+
+		scene.add(t)
+		//t.rotation.y-=THREE.Math.degToRad(90)
+		
+		t.rotation.y+=(this.align).mod(4)*THREE.Math.degToRad(90)
+
+		scene.getChildByName( 'curveT'+this.from.x+','+this.from.y+','+this.from.z).position.set(this.from.x,this.from.y,this.from.z);
+
+
 	}
 	
 
