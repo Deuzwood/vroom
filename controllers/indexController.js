@@ -17,3 +17,7 @@ exports.mine = function(req, res) {
 exports.editor = function(req, res) {
   res.render('terminal' );
 }
+
+exports.terrain_1 = function(req, res) {
+  res.render('layout_map' ,{path: 'empty', script : 'terrain'} );
+}
