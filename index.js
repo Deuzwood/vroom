@@ -34,14 +34,15 @@ let player=[];
 
 io.on('connection', function(socket){
 
-  socket.on('player', (name,color) =>{
-   
-    io.emit('new', socket.id,name,color);
-
+  socket.on('player', (name,color,server) =>{
+    socket.join(server)
+    console.log('Join on server'+server)
+    io.to(server).emit('cl', 'you join '+server)
+    io.to(server).emit('new', socket.id,name,color);
     player.forEach( element => {
-      socket.emit('new', element.socket.id,element.name,element.color)
+      socket.to(element.server).emit('new', element.socket.id,element.name,element.color)
     })
-    player.push({socket:socket,name:name,color:color})
+    player.push({socket:socket,name:name,color:color,server:server})
   })
 
   socket.on('move', function(x,z,r_y){
