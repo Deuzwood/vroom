@@ -15,4 +15,6 @@ router.get(dir+'mine', indexController.mine);
 
 router.get(dir+'editor', indexController.editor);
 
+router.get(dir+'terrain', indexController.terrain_1)
+
 module.exports = router;
