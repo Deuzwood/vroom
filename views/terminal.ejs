@@ -12,19 +12,31 @@
     <script src="../js/jquery.terminal-2.15.2.js"></script>
 </head>
 <body>
-    
 
-    <div style="height: 500px;" id="frame"></div>
-    <div id="terminal"></div>
+
+    <div class="parent">
+        <div class="nav" id="terminal"></div>
+        <div class="div2" id="frame"> </div>
+    </div>
   
 </body>
 <script src="../three.js-dev/three.js"></script>
 <script src="../three.js-dev/OrbitControls.js"></script>
 <script src="../js/stats.js"></script>
+
+<script src="../js/init_map.js"></script>
+<script src="../js/Segment.js"></script>
+<script src="../js/Map.js"></script>
+
+
 <script>
+
+let value = [];
+
 
     let type = 'road';
 
+    
     $('#terminal').terminal({
         hello: function(what) {
             this.echo('Hello, ' + what +
@@ -37,9 +49,26 @@
                 this.echo(element+' n\'est pas un type de route')
         },
         linear: function(length){
-                this.echo('Segment crée');
-                let a =new Segment(type[0],'linear',new THREE.Vector3(x,0,y),length)
-                console.log(a)
+                //this.echo('Segment crée');
+                value.push('lr-'+length);
+                render_()
+        },
+        curve: function(length,side){
+                //this.echo('Segment crée');
+                value.push('cr-'+length+'-'+side[0]);
+                render_()
+        },
+        end: function(){
+                //this.echo('Segment crée');
+                value.push('e');
+                render_()
+        },
+        render: function(){
+            this.echo('Rendu');
+            render_()
+        },
+        new: function(){
+
         },
         exit: function(){
             window.location.replace("http://localhost:3000/test/");
@@ -47,9 +76,13 @@
     }, {
         greetings: 'Map Editor',
     });
-    </script>
-<script src="../js/init_map.js"></script>
-<script src="../js/Segment.js"></script>
-<script scr="../js/Map.js"></script>
 
+    function render_(){
+        document.querySelector('#frame').innerHTML=""
+        init();
+        animate();
+        let map = new Carte(value);
+        map.render();
+    }
+    </script>
 </html>
