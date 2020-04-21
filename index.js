@@ -40,13 +40,14 @@ io.on('connection', function(socket){
     io.to(server).emit('cl', 'you join '+server)
     io.to(server).emit('new', socket.id,name,color);
     player.forEach( element => {
-      socket.to(element.server).emit('new', element.socket.id,element.name,element.color)
+      if(element.server == server)
+        socket.emit('new', element.socket.id,element.name,element.color)
     })
     player.push({socket:socket,name:name,color:color,server:server})
   })
 
   socket.on('move', function(x,z,r_y){
-      socket.broadcast.emit('move', socket.id,x,z,r_y);
+      socket.broadcast.to(socket.rooms['server1']).emit('move', socket.id,x,z,r_y);
   });
 
 
