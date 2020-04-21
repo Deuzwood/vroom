@@ -14,7 +14,7 @@ class Segment {
 		this.type = type;
 		this.shape = shape;
 		this.from = param1;
-		if(shape=='linear'){
+		if(shape=='linear' || shape=='cp'){
 
 			this.to = param2;
 		}
@@ -35,7 +35,7 @@ class Segment {
 
     render_r (){
         let road = new THREE.Object3D();
-        const w = 12;
+        const w = W_ROAD;
     
         let x = this.from.x
         let y = this.from.y
@@ -53,7 +53,9 @@ class Segment {
         let side2 = new THREE.Mesh(geometry , material);
 		side2.position.x+=w/2
 		side2.position.y+=0.5
-        road.add(side2)
+		road.add(side2)
+		
+		
     
         /* ground */
         geometry = new THREE.PlaneGeometry( w, length )
@@ -78,9 +80,52 @@ class Segment {
 		//road.applyMatrix( new THREE.Matrix4().makeTranslation( (this.to.x+this.from.x)/2, (this.to.y+this.from.y)/2, (this.to.z+this.from.z)/2 ) );
 		road.position.set((this.to.x+this.from.x)/2, (this.to.y+this.from.y)/2, (this.to.z+this.from.z)/2 )
 		road.name="road"+this.from.toArray().toString();
-	
+
 		road.lookAt(this.to.x,this.to.y,this.to.z)
-        scene.add(road)
+		scene.add(road)
+		
+	}
+
+	render_cp (){
+        let road = new THREE.Object3D();
+        const w = W_ROAD;
+    
+        let x = this.from.x
+        let y = this.from.y
+		let length = this.from.distanceTo(this.to)
+		console.log(length)
+	
+        /* side */ 
+        var geometry = new THREE.BoxGeometry( 1, 1, length )
+        var material = new THREE.MeshPhongMaterial({ color:0x777777 });
+		let side = new THREE.Mesh(geometry , material)
+		side.position.x-=w/2
+		side.position.y+=0.5
+        road.add(side)
+    
+        let side2 = new THREE.Mesh(geometry , material);
+		side2.position.x+=w/2
+		side2.position.y+=0.5
+		road.add(side2)
+		
+		
+    
+        /* ground */
+        geometry = new THREE.PlaneGeometry( w, length )
+        material = new THREE.MeshPhongMaterial({ color:0x00ffff});
+		let ground = new THREE.Mesh(geometry , material)
+
+		ground.rotation.x= THREE.Math.degToRad(-90);
+		road.add(ground)
+    
+        road.position.set(x,0,y)
+		//road.applyMatrix( new THREE.Matrix4().makeTranslation( (this.to.x+this.from.x)/2, (this.to.y+this.from.y)/2, (this.to.z+this.from.z)/2 ) );
+		road.position.set((this.to.x+this.from.x)/2, (this.to.y+this.from.y)/2, (this.to.z+this.from.z)/2 )
+		road.name="cp"+this.from.toArray().toString();
+
+		road.lookAt(this.to.x,this.to.y,this.to.z)
+		scene.add(road)
+		
 	}
 	
 	
@@ -152,12 +197,13 @@ class Segment {
 	render_c(){
 		let curve = new THREE.Object3D();
 
+		const w = W_ROAD;
 		/*outer*/
 		var shape = new THREE.Shape();
 		shape.moveTo(0, 0);
-		shape.quadraticCurveTo(this.size*12, 0, this.size*12, this.size*12);
-		shape.lineTo(this.size*12-1, this.size*12);
-		shape.quadraticCurveTo(this.size*12-1,1, 0, 1);           
+		shape.quadraticCurveTo(this.size*w, 0, this.size*w, this.size*w);
+		shape.lineTo(this.size*w-1, this.size*w);
+		shape.quadraticCurveTo(this.size*w-1,1, 0, 1);           
 
 		var extrudeSettings = {
 			amount : 1,
@@ -175,10 +221,10 @@ class Segment {
 		/* inner */ 
 		if(this.size!=1){
 			var shape = new THREE.Shape();
-			shape.moveTo(0, 12);
-			shape.quadraticCurveTo((this.size-1)*12, 12, (this.size-1)*12,(this.size)*12);
-			shape.lineTo((this.size-1)*12-1,(this.size)*12);
-			shape.quadraticCurveTo((this.size-1)*12-1,12+1,0,12+1);
+			shape.moveTo(0, w);
+			shape.quadraticCurveTo((this.size-1)*w, w, (this.size-1)*w,(this.size)*w);
+			shape.lineTo((this.size-1)*w-1,(this.size)*w);
+			shape.quadraticCurveTo((this.size-1)*w-1,w+1,0,w+1);
 			var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:0x777777 }));
 	
@@ -196,10 +242,10 @@ class Segment {
 		/* Line */
 		if(this.size!=1){
 			var shape = new THREE.Shape();
-			shape.moveTo(0, 6-0.4);
-			shape.quadraticCurveTo(this.size*12-6+0.4, 0+6-0.4, this.size*12-6+0.4, this.size*12);
-			shape.lineTo((this.size-1)*12+6-0.4,(this.size)*12);
-			shape.quadraticCurveTo((this.size-1)*12+6-0.4, 12-6+0.4, 0,12-6+0.4);
+			shape.moveTo(0, w/2-0.4);
+			shape.quadraticCurveTo(this.size*w-w/2+0.4, 0+w/2-0.4, this.size*w-w/2+0.4, this.size*w);
+			shape.lineTo((this.size-1)*w+w/2-0.4,(this.size)*w);
+			shape.quadraticCurveTo((this.size-1)*w+w/2-0.4, w-w/2+0.4, 0,w-w/2+0.4);
 			var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:0xffffff }));
 			mesh.position.z+=0.01
@@ -209,9 +255,9 @@ class Segment {
 		/* ground */
 		var shape = new THREE.Shape();
 		shape.moveTo(0, 0);
-		shape.quadraticCurveTo(this.size*12, 0, this.size*12, this.size*12);
-		shape.lineTo((this.size-1)*12,(this.size)*12);
-		shape.quadraticCurveTo((this.size-1)*12, 12, 0,12);           
+		shape.quadraticCurveTo(this.size*w, 0, this.size*w, this.size*w);
+		shape.lineTo((this.size-1)*w,(this.size)*w);
+		shape.quadraticCurveTo((this.size-1)*w, w, 0,w);           
 
 		
 
@@ -223,17 +269,17 @@ class Segment {
 		curve.rotation.x-=THREE.Math.degToRad(90)
 		curve.name = 'curve'+this.from.x+','+this.from.y+','+this.from.z
 		//curve.name="TEST"
-		curve.position.z+=6.5
+		curve.position.z+=w/2+0.5
 
 		if(this.side=='r'){
-			curve.position.z+=(this.size-1)*12-0.5+6
-			curve.position.x+=-(this.size-1)*12+0.5-6
+			curve.position.z+=(this.size-1)*w-0.5+w/2
+			curve.position.x+=-(this.size-1)*w+0.5-w/2
 			let c = new THREE.Object3D();
 			c.name = 'curveR'+this.from.x+','+this.from.y+','+this.from.z
 			c.add(curve)
 			c.rotation.y+=THREE.Math.degToRad(90);
-			c.position.z+=+this.size*6
-			c.position.x+=+this.size*6
+			c.position.z+=+this.size*w/2
+			c.position.x+=+this.size*w/2
 			scene.add(c)
 		}
 
@@ -259,22 +305,3 @@ class Segment {
 	
 
   }
-
-
-  Array.prototype.render = function() {
-    this.forEach(segment => {
-            if(segment.shape=='linear'){
-                segment.render_r()
-            }
-            else if(segment.shape=='intersect'){
-                segment.render_i()
-            }
-            else if(segment.shape=='curve'){
-                segment.render_c()
-            }
-		})
-	}
-
-
-
-

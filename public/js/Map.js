@@ -6,6 +6,7 @@ class Carte{
     constructor(...args){
     this.segments = []
     this.checkpoints = []
+    this.navigable = []
 
     /*Position*/
     let position={x:0,y:0,z:0};
@@ -18,17 +19,20 @@ class Carte{
         
         args.forEach( segment => {
             let type,shape,length;
-            if(segment == "checkpoint"){
+            if(segment == "cp"){
+                shape="cp"
                 this.checkpoints.push([next_position.x,next_position.z])
+                next_position.x += 10*Math.cos(THREE.Math.degToRad(align*90))
+                next_position.z += -10*Math.sin(THREE.Math.degToRad(align*90))
             }
-            else if(segment == 'e'){
+            else if(segment == 'end'){
                 shape='end'
             }else{
              type = segment[1].replace('r','road')
              shape = segment[0].replace('l','linear').replace('c','curve');
              length = segment.split('-')[1]
             }
-
+            
             if(shape=="linear"){
                 next_position.x += length*Math.cos(THREE.Math.degToRad(align*90))
                 next_position.z += -length*Math.sin(THREE.Math.degToRad(align*90))
@@ -37,8 +41,8 @@ class Carte{
 
                 let f =THREE.Math.degToRad((side+align)*90);
 
-                next_position.x+= (12*length-6-0.5)*(Math.cos(f)+Math.sin(f))//-6-0.5
-                next_position.z+= (12*length-6-0.5)*(Math.cos(f)-Math.sin(f))//-6-0.5
+                next_position.x+= (W_ROAD*length-W_ROAD/2-0.5)*(Math.cos(f)+Math.sin(f))//-6-0.5
+                next_position.z+= (W_ROAD*length-W_ROAD/2-0.5)*(Math.cos(f)-Math.sin(f))//-6-0.5
             }
 
 /*
@@ -77,6 +81,9 @@ class Carte{
                 this.segments.push( new Segment(type,'linear',new THREE.Vector3(position.x,position.y,position.z),new THREE.Vector3(0,0,0)))
             }
             
+            if(shape=="cp"){
+                this.segments.push( new Segment(type,'cp',new THREE.Vector3(position.x,position.y,position.z),new THREE.Vector3(next_position.x,next_position.y,next_position.z)))
+            }
             if(shape=="linear"){
                 this.segments.push( new Segment(type,shape,new THREE.Vector3(position.x,position.y,position.z),new THREE.Vector3(next_position.x,next_position.y,next_position.z)))
 
@@ -108,6 +115,9 @@ class Carte{
             }
             else if(segment.shape=='curve'){
                 segment.render_c()
+            }
+            else if(segment.shape=='cp'){
+                segment.render_cp()
             }
         })
     } 
