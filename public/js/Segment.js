@@ -14,9 +14,13 @@ class Segment {
 		this.type = type;
 		this.shape = shape;
 		this.from = param1;
-		if(shape=='linear' || shape=='cp'){
+		if(shape=='linear' || shape=='cp' || shape=='tunnel' || shape=='boost'){
 
 			this.to = param2;
+		}
+		if(shape == 'cp'){
+			this.to = param2[0];
+			this.number = param2[1]
 		}
 		if(shape=='intersect'){
 			this.open = param2 ;
@@ -26,6 +30,12 @@ class Segment {
 			this.align = param2[1];
 			this.side = param2[2]
 		}
+		if(shape=='bezier'){
+			this.from = param1;
+			this.align = param2[0];
+			this.length = parseInt(param2[1])
+			this.diff = parseInt(param2[2])
+		}
 		 	
 
 
@@ -34,7 +44,7 @@ class Segment {
 
 
     render_r (){
-        let road = new THREE.Object3D();
+        let road = new THREE.Group();
         const w = W_ROAD;
     
         let x = this.from.x
@@ -44,22 +54,25 @@ class Segment {
 	
         /* side */ 
         var geometry = new THREE.BoxGeometry( 1, 1, length )
-        var material = new THREE.MeshPhongMaterial({ color:0x777777 });
+        var material = new THREE.MeshPhongMaterial({ color: CLR_SIDE });
 		let side = new THREE.Mesh(geometry , material)
 		side.position.x-=w/2
 		side.position.y+=0.5
-        road.add(side)
+        road.attach(side)
     
         let side2 = new THREE.Mesh(geometry , material);
 		side2.position.x+=w/2
 		side2.position.y+=0.5
 		road.add(side2)
+
+		collidable.push(side)
+		collidable.push(side2)
 		
 		
     
         /* ground */
         geometry = new THREE.PlaneGeometry( w, length )
-        material = new THREE.MeshPhongMaterial({ color:0x222222});
+        material = new THREE.MeshPhongMaterial({ color:CLR_GROUND});
 		let ground = new THREE.Mesh(geometry , material)
 
 		ground.rotation.x= THREE.Math.degToRad(-90);
@@ -67,14 +80,26 @@ class Segment {
 		
 		/** line */
 		geometry = new THREE.PlaneGeometry( 0.8, 6 )
-        material = new THREE.MeshPhongMaterial({ color:0xffffff});
+        material = new THREE.MeshPhongMaterial({ color: CLR_LINE});
         for(let i=0;i<length-5;i+=10){
             let ground = new THREE.Mesh(geometry , material)
             ground.position.y+=0.01
             ground.position.z+=i-length/2+6
             ground.rotation.x= THREE.Math.degToRad(-90);
             road.add(ground)
-        }
+		}
+		
+		if(this.shape == 'tunnel'){
+			var geometry = new THREE.CylinderGeometry( w/2, w/2, length, 8, 1, true, Math.PI, Math.PI );
+			var material = new THREE.MeshPhongMaterial( {color: 0x333333,side:THREE.DoubleSide} );
+			var cylinder = new THREE.Mesh( geometry, material );
+
+			cylinder.rotation.z= THREE.Math.degToRad(-90);
+			cylinder.rotation.y= THREE.Math.degToRad(-90);
+			//cylinder.lookAt(this.to)
+			road.add( cylinder );
+
+		}
     
         road.position.set(x,0,y)
 		//road.applyMatrix( new THREE.Matrix4().makeTranslation( (this.to.x+this.from.x)/2, (this.to.y+this.from.y)/2, (this.to.z+this.from.z)/2 ) );
@@ -82,22 +107,108 @@ class Segment {
 		road.name="road"+this.from.toArray().toString();
 
 		road.lookAt(this.to.x,this.to.y,this.to.z)
+		//road.castShadow = true;
+		road.receiveShadow = true;
 		scene.add(road)
+		AABB_road.push(new THREE.Box3().setFromObject(road))
+		scene.add(lampadaire((this.to.x+this.from.x)/2-10, (this.to.z+this.from.z)/2-10));
+
 		
 	}
 
-	render_cp (){
-        let road = new THREE.Object3D();
+	render_boost (){
+        let road = new THREE.Group();
         const w = W_ROAD;
     
         let x = this.from.x
         let y = this.from.y
 		let length = this.from.distanceTo(this.to)
-		console.log(length)
+
 	
         /* side */ 
+		var geometry = new THREE.BoxGeometry( 1, 1, length )
+        var material = new THREE.MeshPhongMaterial({ color: CLR_SIDE });
+		let side = new THREE.Mesh(geometry , material)
+		side.position.x-=w/2
+		side.position.y+=0.5
+        road.attach(side)
+    
+        let side2 = new THREE.Mesh(geometry , material);
+		side2.position.x+=w/2
+		side2.position.y+=0.5
+		road.add(side2)
+
+		collidable.push(side)
+		collidable.push(side2)
+		
+		
+    
+        /* ground */
+		geometry = new THREE.PlaneGeometry( w, length,length/2,length/5 )
+		geometry.faces.forEach( (f,i) => {
+			if(i%8==0) f.color.set( 0xffff00)
+			else f.color.set( CLR_GROUND)
+		} )
+        material = new THREE.MeshPhongMaterial({ color:CLR_LINE ,  vertexColors: THREE.VertexColors,});
+		let ground = new THREE.Mesh(geometry , material)
+
+		ground.rotation.x= THREE.Math.degToRad(-90);
+		road.add(ground)
+    
+        road.position.set(x,0,y)
+		//road.applyMatrix( new THREE.Matrix4().makeTranslation( (this.to.x+this.from.x)/2, (this.to.y+this.from.y)/2, (this.to.z+this.from.z)/2 ) );
+		road.position.set((this.to.x+this.from.x)/2, (this.to.y+this.from.y)/2, (this.to.z+this.from.z)/2 )
+		road.name="road"+this.from.toArray().toString();
+
+		road.lookAt(this.to.x,this.to.y,this.to.z)
+		//road.castShadow = true;
+		road.receiveShadow = true;
+		scene.add(road)
+		AABB_road.push(new THREE.Box3().setFromObject(road))
+		
+	}
+
+	render_cp (){
+		
+
+        let road = new THREE.Object3D();
+		const w = W_ROAD;
+
+		let x = this.from.x
+        let y = this.from.y
+		let length = this.from.distanceTo(this.to)
+	
+		
+		/**
+		 * box sur le coté
+		 */
+		let P = new THREE.Object3D();
+		var geometry = new THREE.BoxGeometry( 0.8, 8, 0.8 )
+        var material = new THREE.MeshPhongMaterial({ color: CLR_SIDE });
+		let pan = new THREE.Mesh(geometry , material)
+		
+		pan.position.y+=4+0.1
+		
+		let pan2 = pan.clone()
+		pan.position.x-=w/2
+		pan2.position.x+=w/2
+
+		var geometry = new THREE.BoxGeometry( w, 1, 0.8 )
+        var material = new THREE.MeshPhongMaterial({ color: CLR_SIDE });
+		let pan_up = new THREE.Mesh(geometry , material)
+		pan_up.position.y=8-0.4
+		
+	
+
+		road.add(pan)
+		road.add(pan2)
+		road.add(pan_up)
+		
+    
+
+        /* side */ 
         var geometry = new THREE.BoxGeometry( 1, 1, length )
-        var material = new THREE.MeshPhongMaterial({ color:0x777777 });
+        var material = new THREE.MeshPhongMaterial({ color: CLR_SIDE });
 		let side = new THREE.Mesh(geometry , material)
 		side.position.x-=w/2
 		side.position.y+=0.5
@@ -108,11 +219,14 @@ class Segment {
 		side2.position.y+=0.5
 		road.add(side2)
 		
-		
+		collidable.push(side)
+		collidable.push(side2)
     
-        /* ground */
-        geometry = new THREE.PlaneGeometry( w, length )
-        material = new THREE.MeshPhongMaterial({ color:0x00ffff});
+		/* ground */
+		geometry = new THREE.PlaneGeometry( w, length )
+
+		let clr_ground = this.number ? CLR_GROUND : 0xff0000 
+        material = new THREE.MeshPhongMaterial({ color : clr_ground});
 		let ground = new THREE.Mesh(geometry , material)
 
 		ground.rotation.x= THREE.Math.degToRad(-90);
@@ -121,10 +235,11 @@ class Segment {
         road.position.set(x,0,y)
 		//road.applyMatrix( new THREE.Matrix4().makeTranslation( (this.to.x+this.from.x)/2, (this.to.y+this.from.y)/2, (this.to.z+this.from.z)/2 ) );
 		road.position.set((this.to.x+this.from.x)/2, (this.to.y+this.from.y)/2, (this.to.z+this.from.z)/2 )
-		road.name="cp"+this.from.toArray().toString();
+		road.name="cp"+this.from.toArray().toString()
 
 		road.lookAt(this.to.x,this.to.y,this.to.z)
 		scene.add(road)
+		AABB_road.push(new THREE.Box3().setFromObject(road))
 		
 	}
 	
@@ -137,7 +252,7 @@ class Segment {
 			let side,geometry,material,line;
 			if(element){
 				geometry = new THREE.BoxGeometry( 1, 1, w )
-				material = new THREE.MeshPhongMaterial({ color:0x777777 });
+				material = new THREE.MeshPhongMaterial({ color: CLR_SIDE });
 				side = new THREE.Mesh(geometry , material)
 
 				line = new THREE.Mesh( new THREE.PlaneGeometry(0.8 , 3) , new THREE.MeshPhongMaterial( {color : 0xffffff }))
@@ -180,7 +295,7 @@ class Segment {
 
 		/* ground */
 		let geometry = new THREE.PlaneGeometry( w, w )
-		let material = new THREE.MeshPhongMaterial({ color:0x222222, side:THREE.DoubleSide});
+		let material = new THREE.MeshPhongMaterial({ color: CLR_GROUND , side:THREE.DoubleSide});
 		let ground = new THREE.Mesh(geometry , material)
 		ground.position.x+=w/2
 		ground.rotation.x= THREE.Math.degToRad(-90);
@@ -213,10 +328,11 @@ class Segment {
 		};
 
 		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:0x777777 }));
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:CLR_SIDE }));
 		curve.add( mesh );
 	
 		
+		collidable.push(mesh)
 
 		/* inner */ 
 		if(this.size!=1){
@@ -226,11 +342,12 @@ class Segment {
 			shape.lineTo((this.size-1)*w-1,(this.size)*w);
 			shape.quadraticCurveTo((this.size-1)*w-1,w+1,0,w+1);
 			var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-			var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:0x777777 }));
+			var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:CLR_SIDE }));
 	
 	
 			curve.add( mesh );
 		}
+		collidable.push(mesh)
 
 		var extrudeSettings = {
 			amount : 0,
@@ -239,15 +356,16 @@ class Segment {
 			curveSegments: 10*this.size
 		};
 		
+		
 		/* Line */
 		if(this.size!=1){
 			var shape = new THREE.Shape();
-			shape.moveTo(0, w/2-0.4);
-			shape.quadraticCurveTo(this.size*w-w/2+0.4, 0+w/2-0.4, this.size*w-w/2+0.4, this.size*w);
-			shape.lineTo((this.size-1)*w+w/2-0.4,(this.size)*w);
-			shape.quadraticCurveTo((this.size-1)*w+w/2-0.4, w-w/2+0.4, 0,w-w/2+0.4);
+			shape.moveTo(0, w/2-0.2);
+			shape.quadraticCurveTo(this.size*w-w/2+0.2, 0+w/2-0.2, this.size*w-w/2+0.2, this.size*w);
+			shape.lineTo((this.size-1)*w+w/2-0.2,(this.size)*w);
+			shape.quadraticCurveTo((this.size-1)*w+w/2-0.2, w-w/2+0.2, 0,w-w/2+0.2);
 			var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-			var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:0xffffff }));
+			var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: CLR_LINE }));
 			mesh.position.z+=0.01
 			curve.add( mesh );
 		}
@@ -262,7 +380,7 @@ class Segment {
 		
 
 		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color:0x222222 }));
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: CLR_GROUND }));
 		curve.add( mesh );
 
 
@@ -294,14 +412,113 @@ class Segment {
 		
 
 		scene.add(t)
+		
 		//t.rotation.y-=THREE.Math.degToRad(90)
 		
 		t.rotation.y+=(this.align).mod(4)*THREE.Math.degToRad(90)
 
-		scene.getChildByName( 'curveT'+this.from.x+','+this.from.y+','+this.from.z).position.set(this.from.x,this.from.y,this.from.z);
+		//scene.getChildByName( 'curveT'+this.from.x+','+this.from.y+','+this.from.z).position.set(this.from.x,this.from.y,this.from.z);
+
+		t.position.set(this.from.x,this.from.y,this.from.z);
+		AABB_road.push(new THREE.Box3().setFromObject(t))
+	}
+
+	render_bezier(){
+		/**
+		 * Bezier Curve
+		 */
+		let bezier = new THREE.Object3D();
 
 
+		const w = W_ROAD;
+
+		/*outer  - r */
+		var shape = new THREE.Shape();
+		shape.moveTo(0,0);
+		shape.bezierCurveTo(0,this.length/2,this.diff,this.length/2,this.diff,this.length);
+		shape.lineTo(this.diff-1,this.length);
+		shape.bezierCurveTo(this.diff-1,this.length/2,-1,this.length/2,-1,0);           
+
+		var extrudeSettings = {
+			amount : 1,
+			steps : 1,
+			bevelEnabled: false,
+			curveSegments: this.length
+		};
+
+		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: CLR_SIDE, }));
+		bezier.add( mesh );
+		collidable.push(mesh)
+	
+		let a = mesh.clone()
+		a.position.x-=w
+		bezier.add(a)
+		bezier.position.set(0,0,0)
+		collidable.push(a)
+
+		/**
+		 * line
+		 */
+		var extrudeSettings = {
+			amount : 0,
+			steps : 1,
+			bevelEnabled: false,
+			curveSegments: this.length
+		};
+		
+
+		var shape = new THREE.Shape();
+		shape.moveTo(0,0);
+		shape.bezierCurveTo(0,this.length/2,this.diff,this.length/2,this.diff,this.length);
+		shape.lineTo(this.diff-0.8,this.length);
+		shape.bezierCurveTo(this.diff-0.8,this.length/2,-0.8,this.length/2,-0.8,0);
+		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: CLR_LINE }));
+		mesh.position.z+=0.01
+		mesh.position.x-=w/2+0.1
+		bezier.add( mesh );
+		
+
+		/* ground */
+		var shape = new THREE.Shape();
+		/*shape.moveTo(0, 0);
+		shape.bezierCurveTo(this.size*w, 0, this.size*w, this.size*w);
+		shape.lineTo((this.size-1)*w,(this.size)*w);
+		shape.bezierCurveTo((this.size-1)*w, w, 0,w);   */
+		
+		shape.moveTo(0,0);
+		shape.bezierCurveTo(0,this.length/2,this.diff,this.length/2,this.diff,this.length);
+		shape.lineTo(this.diff-w,this.length);
+		shape.bezierCurveTo(this.diff-w,this.length/2,-w,this.length/2,-w,0);   
+
+
+
+		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: CLR_GROUND }));
+		bezier.add( mesh );
+
+
+		//bezier.rotation.x-=THREE.Math.degToRad(90)
+		//bezier.name = 'curve'+this.from.x+','+this.from.y+','+this.from.z
+
+		bezier.position.x+=w/2+0.5
+
+		//scene.add(bezier)
+		//scene.getObjectByName( 'bezier'+this.from.x+','+this.from.y+','+this.from.z).position.set(this.from.x,this.from.y,this.from.z);
+
+
+		let t = new THREE.Object3D();
+		//t.name = 'bezierT'+this.from.x+','+this.from.y+','+this.from.z
+		t.add(bezier).position.set(this.from.x,this.from.y,this.from.z);
+
+		
+
+		scene.add(t)
+		t.rotation.x-=THREE.Math.degToRad(90)
+		t.rotation.z=(this.align-1).mod(4)*THREE.Math.degToRad(90)
+		AABB_road.push( new THREE.Box3().setFromObject(t))
+		//scene.getChildByName( 'bezierT'+this.from.x+','+this.from.y+','+this.from.z).position.set(this.from.x,this.from.y,this.from.z);
 	}
 	
-
   }
