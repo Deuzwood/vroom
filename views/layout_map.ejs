@@ -13,24 +13,8 @@
         <%- include(`${path}`); %>
         
         
-        <script src="/three.js-dev/three.js"></script>
-        <script src="/three.js-dev/OrbitControls.js"></script>
-        <script src="/js/stats.js"></script>
+        <%- include('inc/list_script'); %>
 
-        <script src="/js/init_map.js"></script>
-        <script src="/js/Segment.js"></script>
-        <script src="/js/Map.js"></script>
-
-        <script type="module">
-            import * as env from '/js/Environnement.js'; 
-
-
-           /*scene.add(env.lampadaire(10,10));
-            scene.add(env.lampadaire(40,10));
-            scene.add(env.lampadaire(70,10));
-            scene.add(env.lampadaire(100,10));*/
-
-        </script>
         <script src="/js/<%= script %>.js"></script>
     </body>
 </html>
