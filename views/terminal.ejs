@@ -16,19 +16,25 @@
 
     <div class="parent">
         <div class="nav" id="terminal"></div>
-        <div class="div2" id="frame"> </div>
+        <div class="div2" id="frame"></div>
     </div>
   
 </body>
+
+
+
 <script src="/three.js-dev/three.js"></script>
 <script src="/three.js-dev/OrbitControls.js"></script>
 <script src="/js/stats.js"></script>
 
 <script src="/js/const.js"></script>
+<script src="/js/Environnement.js"></script>
 
 <script src="/js/init_map.js"></script>
 <script src="/js/Segment.js"></script>
 <script src="/js/Map.js"></script>
+
+<script src="/js/const_map.js"></script>
 
 
 <script>
@@ -37,12 +43,25 @@ let value = [];
 let map;
 
     let type = 'road';
-
     
     $('#terminal').terminal({
-        hello: function(what) {
-            this.echo('Hello, ' + what +
-                      '. Wellcome to this terminal.');
+        help: function() {
+            this.echo('Bienvenue dans l\'éditeur de carte.');
+
+            this.echo('Voici la liste des commandes disponibles : ');
+            this.echo('Entre crochets sont les paramètres , aucun n\'est optionnel' );
+
+            this.echo('linear [length]');
+            this.echo('curve [size] [r-l]');
+            this.echo('bezier [length] [diff]');
+            this.echo('boost [length]');
+            this.echo('cp');
+
+            this.echo('');
+
+            this.echo('pop');
+            this.echo('save');
+            this.echo('load [nom]');
         },
         type: function(element){
             if(element=='road')
@@ -52,17 +71,27 @@ let map;
         },
         linear: function(length){
                 //this.echo('Segment crée');
-                value.push('lr-'+length);
+                value.push('linear '+length);
                 render_()
         },
         cp: function(){
                 //this.echo('Segment crée');
-                value.push('cp');
+                value.push('checkpoint');
                 render_()
         },
         curve: function(length,side){
                 //this.echo('Segment crée');
-                value.push('cr-'+length+'-'+side[0]);
+                value.push('curve '+length+' '+side[0]);
+                render_()
+        },
+        bezier: function(length,diff){
+                //this.echo('Segment crée');
+                value.push('bezier '+length+' '+diff);
+                render_()
+        },
+        boost: function(length){
+                //this.echo('Segment crée');
+                value.push('boost '+length);
                 render_()
         },
         end: function(){
@@ -70,12 +99,40 @@ let map;
                 value.push('e');
                 render_()
         },
+        pop: function(){
+            value.pop()
+            render_()
+        },
         render: function(){
             this.echo('Rendu');
             render_()
         },
         new: function(){
+            this.echo('Rendu');
+            render_()
+        },
+        load: function(name){
+            
+            if(name==2){
+                render_(map_2)
+                this.echo('Loading...');
+            }
+            else{
+                this.echo('Caret Undefined')
+            }
 
+        },
+        save: function(){
+            this.echo('-- A COPIER --')
+            this.echo("'" + value.join("',\n'") + "'")
+            this.echo('-- FIN  --')
+        },
+        
+        new: function(){
+            value = []
+            document.querySelector('#frame').innerHTML=""
+            init();
+            animate();
         },
         exit: function(){
             window.location.replace("http://localhost:3000/test/");
@@ -84,10 +141,13 @@ let map;
         greetings: 'Map Editor',
     });
 
-    function render_(){
+    function render_(rend){
         document.querySelector('#frame').innerHTML=""
         init();
         animate();
+        if(rend){
+            value = rend
+        }
         map = new Carte(value);
         map.render();
     }
