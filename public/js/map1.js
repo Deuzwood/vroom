@@ -1,15 +1,14 @@
-const circuit_1 = new Carte(
-  'lr-50',
-  'cr-3-l',
-  'checkpoint',
-  'lr-20',
-  'cr-1-l',
-  'lr-120',
-  'checkpoint',
- 'cr-3-l',
- 'lr-20',
- 'cr-1-l',
-  'lr-70',
-);
+let p = window.location.href.split('/')
+last =  p.pop()
 
-circuit_1.render();
+let carte;
+if(last=='map1'){
+    carte = new Carte(map_1)
+
+}else if(last == 'map2'){
+    carte = new Carte(map_2)
+
+}else if(last == 'map3'){
+    carte = new Carte(map_3)
+}
+carte.render();
