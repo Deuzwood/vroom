@@ -145,7 +145,7 @@ function bush(x,y,z,r=false){
 
 function forest(pos, radius){
     let forest = new THREE.Object3D();
-    for(let i=0;i<radius/2;i++){
+    for(let i=0;i<radius*2;i++){
         let angle = 2*Math.random()*Math.PI;
         let raduis_sq = Math.random()*radius*radius;
         let x = Math.sqrt(raduis_sq)*Math.cos(angle);
