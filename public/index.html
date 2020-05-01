@@ -27,19 +27,27 @@
 
       
       <div class="row">
-        <div class="col-sm-6">
-          <div class="card" id="server1">
+        <div class="col-sm-4">
+          <div class="card border-success" id="server1">
+            <img class="card-img-top" src="/img/map_1.png" alt="Carte numero 1">
             <div class="card-body">
-              <h5 class="card-title">Carte 1</h5>
-              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-              </div>
+              <p class="card-text">Circuit simple avec quelques virages techniques.</p>
+            </div>
           </div>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="card" id="server2">
+            <img class="card-img-top" src="/img/map_2.png" alt="Pas d'image">
             <div class="card-body">
-              <h5 class="card-title">Carte 2</h5>
-              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+              <p class="card-text">En construction.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card" id="server3">
+            <img class="card-img-top" src="/img/map_3.png" alt="Pas d'image">
+            <div class="card-body">
+              <p class="card-text">Quelques virages, et des boosts</p>
             </div>
           </div>
         </div>
@@ -51,6 +59,8 @@
 
 
       <h2>Notes</h2>
+      <p>Version 0.0.1</p>
+
       <p>✔ Meilleures performances sous <a href="https://www.mozilla.org/fr/firefox/new/">Firefox</a></p>
 
       <p>❌ Ne tourne pas sous Edge</p>
@@ -65,7 +75,7 @@
 
     <div id="stats" class="stats d-none">
 			Inc : <span class="r" id="inc">0</span> <br>
-			Nombre de tour : <span class="r" id="nbtour">0</span> <br>
+			Nombre de tour : <span class="r"><span id="nbtour">0</span> / <span id="nb_max_tour"></span></span><br>
       Dernier tour : <span class="r" id="last_time">Aucun</span><br>
       Meilleur tour : <span class="r" id="best_time">Aucun</span>
 		</div>
@@ -78,7 +88,7 @@
     <div id='gui' class="gui d-none">
       
       
-<button type="button" class="btn btn-sm btn-block btn-light help" data-toggle="modal" data-target="#Modal_help">
+<button type="button" class="btn btn-sm btn-block btn-light help" data-toggle="modal" data-target="#Menu">
   Aide <i class="ri-question-line"></i>
 
 </button>
@@ -92,7 +102,7 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="Modal_help" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="Menu" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -102,15 +112,19 @@
         </button>
       </div>
       <div class="modal-body">
-        Touches directionnelles pour controller la voiture<br>
-        <i class="ri-arrow-up-s-line"></i> Avancer <br>
-        <i class="ri-arrow-down-s-line"></i> Reculer <br>
-        <i class="ri-arrow-left-s-line"></i> Gauche <br>
-        <i class="ri-arrow-right-s-line"></i> Droite <br>
+        Controls<br>
 
+        <p>
+        <span class="border border-secondary" id="key_forward"></span> <i class="ri-arrow-up-s-line"></i> Avancer <br><br>
+        <span class="border border-secondary" id="key_left"></span> <i class="ri-arrow-left-s-line"></i> Gauche <br><br>
+        <span class="border border-secondary" id="key_right"></span>  <i class="ri-arrow-right-s-line"></i> Droite <br><br>
+        <span class="border border-secondary" id="key_backward"></span>  <i class="ri-arrow-down-s-line"></i> Reculer <br><br>
 
-
-        'A' pour changer la caméra
+        <span class="border border-secondary" id="key_camera"></span> pour changer de caméra<br>
+        
+        <span class="border border-secondary" id="key_respawn"></span> pour respawn au dernier checkpoints<br>
+        <span class="border border-secondary" id="key_restart"></span> pour recommencer à zero<br>
+      </p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
@@ -123,9 +137,12 @@
 
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 
+
+
     
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
 
 		<script src="three.js-dev/three.js"></script>
 
@@ -133,16 +150,23 @@
     <script src="three.js-dev/OBJLoader.js"></script>
 
     <script src="three.js-dev/OrbitControls.js"></script>
+
+  <script src="/js/const.js"></script>
+
     <script src="js/stats.js"></script>
 
     <script src="js/Segment.js"></script>
     <script src="js/Map.js"></script>
-
-    <script src="js/map1.js"></script>
+    <script src="js/terrain.js"></script>
+    <script src="js/Environnement.js"></script>
+    <script src="js/const_map.js"></script>
     
   <script src="js/server.js"></script>
 
+
     <script src="sketch.js"></script>
+
+
 
 	</body>
 </html>
