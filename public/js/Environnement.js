@@ -1,5 +1,5 @@
 
-function lampadaire(x,y){
+function lampadaire(x,y,rot=1){
     let group = new THREE.Object3D();
 
     let material = new THREE.MeshPhongMaterial({color:0x222222});
@@ -31,7 +31,7 @@ function lampadaire(x,y){
     group.add(led);
     
     group.position.set(x,0,y)
-    group.rotation.y+= THREE.Math.degToRad(90)
+    group.rotation.y+= THREE.Math.degToRad(90*rot)
     return group
 }
 
@@ -44,7 +44,7 @@ function lampadaire(x,y){
  *      -Feuilles foncés , ou plus claires
  *      -Cerisier ( fleuilles roses )
  */
-function tree(x,y,z){
+function tree(x,y,z,r=false){
     let tree = new THREE.Object3D();
 
     if(Math.random()>0.05){
@@ -59,6 +59,13 @@ function tree(x,y,z){
         geometry = new THREE.DodecahedronGeometry( 2.5 );
         let clr = Math.random() > 0.4 ? CLR_LEAVES : (Math.random()>0.4 ? CLR_LEAVES_VAR1 : CLR_LEAVES_VAR2)
         material = new THREE.MeshPhongMaterial( {color: clr , flatShading:false} );
+       
+        if(Math.random()>0.5){
+            geometry.vertices.forEach( el => {
+                el.x+=Math.random()-Math.random()
+            })
+        }
+
         dodecahedre = new THREE.Mesh( geometry, material );
         dodecahedre.position.y+=6
         dodecahedre.rotation.y=Math.random();
@@ -86,17 +93,21 @@ function tree(x,y,z){
 
     tree.position.set(x,y,z);
     tree.castShadow = true;
-    scene.add(tree);
+    if(r)
+        return tree
+    else
+        scene.add(tree);
 }
 
 /**
  * Genere un buisson à la position x,y,z
+ * 
  * Variantes : 
  *      -Double buisson
  *      -Triple buisson
  *      -Couleur LEAVE - VAR 1
  */
-function bush(x,y,z){
+function bush(x,y,z,r=false){
     let bush = new THREE.Object3D();
 
     /* Feuille */
@@ -126,5 +137,26 @@ function bush(x,y,z){
 
     bush.position.set(x,y,z);
     bush.rotation.y = Math.random()
-    scene.add(bush);
+    if(r)
+        return bush
+    else
+        scene.add(bush);
 }
+
+function forest(pos, radius){
+    let forest = new THREE.Object3D();
+    for(let i=0;i<radius/2;i++){
+        let angle = 2*Math.random()*Math.PI;
+        let raduis_sq = Math.random()*radius*radius;
+        let x = Math.sqrt(raduis_sq)*Math.cos(angle);
+        let y = Math.sqrt(raduis_sq)*Math.sin(angle);
+        if(Math.random()>0.3)
+            forest.add(tree(x, 0 ,y,true))
+        else
+            forest.add(bush(x, 0 ,y,true))
+    }
+    forest.position.set(pos.x,pos.y,pos.z)
+    scene.add(forest)
+}
+
+forest(new THREE.Vector3(-40,0,-140),30)
