@@ -182,6 +182,11 @@ scene.background = new THREE.Color(0x444444)
 		carte = new Carte(map_3)
 
 	}
+	if(map_name=="server4"){
+		console.log("render server4")
+		carte = new Carte(map_4)
+
+	}
 
 	/* Routine pour toutes les carte */
 	checkpoints = new Array(carte.cp.length).fill(0);

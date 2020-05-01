@@ -112,15 +112,28 @@ let map;
             render_()
         },
         load: function(name){
-            
-            if(name==2){
-                render_(map_2)
-                this.echo('Loading...');
+            switch (name) {
+                case 1:
+                    render_(map_1)
+                    this.echo('Loading...');
+                    break;
+                case 2:
+                    render_(map_2)
+                    this.echo('Loading...');
+                    break;
+                case 3:
+                    render_(map_3)
+                    this.echo('Loading...');
+                    break;
+                case 4:
+                    render_(map_4)
+                    this.echo('Loading...');
+                    break;
+                
+                default:
+                    this.echo('Caret Undefined')
+                    break;
             }
-            else{
-                this.echo('Caret Undefined')
-            }
-
         },
         save: function(){
             this.echo('-- A COPIER --')
