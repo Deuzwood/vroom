@@ -90,10 +90,11 @@ box = map;
                 }
             })
             const max = Math.max(a.y,Math.max(b.y,c.y))
-            if(max <1) f.color.set(0x336600)
-            else if(max <=10) f.color.set(0x664400)
-            else if(max <=20) f.color.set(0x675b4e)
-            else if(max <=30) f.color.set(0x565656)
+            if(max <1) f.color.set(CLR_GRASS)
+            else if(max <=10) f.color.set(CLR_DIRT)
+            else if(max <=20) f.color.set(CLR_CLAY)
+            else if(max <=30) f.color.set(CLR_STONE)
+            else f.color.set( CLR_SNOW)
 
     })
     geometry.colorsNeedUpdate = true
