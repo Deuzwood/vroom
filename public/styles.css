@@ -18,3 +18,7 @@ form { background-color: white;}
 #speed {
     font-size: 32px;
 }
+
+.border-success {
+    border-width:2px !important;
+}
