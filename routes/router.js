@@ -3,6 +3,9 @@ var router = express.Router();
 
 const indexController = require('../controllers/indexController');
 
+
+router.get( '/' , indexController.main);
+
 const dir = '/test/';
 
 router.get(dir+'', indexController.index);

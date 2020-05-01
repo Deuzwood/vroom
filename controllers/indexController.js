@@ -1,5 +1,9 @@
+exports.main = function(req, res) {
+  res.render('index');
+};
+
 exports.index = function(req, res) {
-  res.render('layout_map',{ path: 'empty',script : '' });
+  res.render('layout_map',{ path: 'empty',script : 'sketch' });
 };
 
 exports.map = function(req, res) {

@@ -8,11 +8,6 @@ var port = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-});
-
-
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -47,7 +42,7 @@ io.on('connection', function(socket){
   })
 
   socket.on('move', function(x,z,r_y){
-      socket.broadcast.to(socket.rooms['server1']).emit('move', socket.id,x,z,r_y);
+      socket.broadcast.to(socket.rooms['server3']).emit('move', socket.id,x,z,r_y);
   });
 
 
