@@ -43,9 +43,9 @@ box = map;
      
      geometry.rotateX(THREE.Math.degToRad(-90))
 
-        geometry.translate(gen.getCenter().x,-0.1,gen.getCenter().z)
+        geometry.translate(gen.getCenter().x,-0.2,gen.getCenter().z)
     for(let i=geometry.vertices.length-1;i>0;i--){
-        geometry.vertices[i].y=-Math.random()-1
+     //   geometry.vertices[i].y=0
 
         let m = []
         AABB_road.forEach( box => {
@@ -57,12 +57,12 @@ box = map;
        // console.log(Math.min(...m))
         m = Math.min(...m)
         if(m!=0){
-            geometry.vertices[i].y=m+Math.random()*2
+            geometry.vertices[i].y=m/2.5+Math.random()*4
         }
         if(gen.containsPoint(geometry.vertices[i]) && m!=0)
-            geometry.vertices[i].y=m/2-Math.random()*2
+            geometry.vertices[i].y=m/2-Math.random()*5+Math.log(m)
        
-            //geometry.vertices.splice(i, 1)
+          
     }
 
     /*for(let i=geometry_w.vertices.length-1;i>0;i--){
@@ -78,14 +78,14 @@ box = map;
             const b = geometry.vertices[f.b]
             const c = geometry.vertices[f.c]
 
-
+            let m = []
             AABB_road.forEach( box => {
                 box.min.y=-5
                 box.max.y=20
                 if( box.containsPoint(a) || box.containsPoint(b) || box.containsPoint(c)){
-                    geometry.vertices[f.a].y=-Math.random()-0.5
-                    geometry.vertices[f.b].y=-Math.random()-0.5
-                    geometry.vertices[f.c].y=-Math.random()-0.5
+                   geometry.vertices[f.a].y=-0.2
+                    geometry.vertices[f.b].y=-0.2
+                    geometry.vertices[f.c].y=-0.2
                    
                 }
             })
@@ -121,23 +121,3 @@ box = map;
 
     
 }
-
-let circuit_1 = new Carte(map_2)
-    circuit_1.render();
-terrain(new THREE.Vector3(0,0,0),new THREE.Vector3(100,0,100))
-
-
-for(let i=0; i<70;i+=10){
-    tree(i,0,10)
-}
-
-
-for(let i=0; i<4;i++){
-    for(let j=0;j<2;j++)
-    tree(70+10*j+(5*Math.random()),0,-20-10*i+(5*Math.random()))
-}
-
-bush(70,0,10)
-bush(80,0,10)
-bush(75,0,15)
-forest(new THREE.Vector3(-40,0,-140),30)

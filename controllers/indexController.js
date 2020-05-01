@@ -22,6 +22,11 @@ exports.editor = function(req, res) {
   res.render('terminal' );
 }
 
-exports.terrain_1 = function(req, res) {
-  res.render('layout_map' ,{path: 'empty', script : 'terrain'} );
+exports.terrain = function(req, res) {
+  res.render('layout_map' ,{path: 'empty', script : 'ter_test'} );
 }
+
+exports.environnement = function(req, res) {
+  res.render('layout_map' ,{path: 'empty', script : 'env_test'} );
+}
+
