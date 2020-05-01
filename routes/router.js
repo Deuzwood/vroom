@@ -9,7 +9,7 @@ router.get(dir+'', indexController.index);
 
 router.get(dir+'map', indexController.map);
 
-router.get(dir+'map1', indexController.circuit_1);
+router.get(dir+'map:id', indexController.circuit);
 
 router.get(dir+'mine', indexController.mine);
 
