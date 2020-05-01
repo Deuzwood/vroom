@@ -158,5 +158,3 @@ function forest(pos, radius){
     forest.position.set(pos.x,pos.y,pos.z)
     scene.add(forest)
 }
-
-forest(new THREE.Vector3(-40,0,-140),30)

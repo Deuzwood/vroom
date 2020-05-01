@@ -18,6 +18,10 @@ router.get(dir+'mine', indexController.mine);
 
 router.get(dir+'editor', indexController.editor);
 
-router.get(dir+'terrain', indexController.terrain_1)
+router.get(dir+'terrain', indexController.terrain_1);
+
+router.get(dir+'tree', indexController.environnement);
+router.get(dir+'bush', indexController.environnement);
+router.get(dir+'forest', indexController.environnement);
 
 module.exports = router;

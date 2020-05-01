@@ -107,8 +107,10 @@ box = map;
         // wireframe:true,
         vertexColors: THREE.VertexColors,
         //required for flat shading
-        flatShading:false,
+        flatShading:true,
     }))
+
+    mesh.receiveShadow = true;
     
     //mesh.rotation.x+=THREE.Math.degToRad(-90)
     mesh.position.y+=0.1
@@ -129,6 +131,13 @@ for(let i=0; i<70;i+=10){
     tree(i,0,10)
 }
 
+
+for(let i=0; i<4;i++){
+    for(let j=0;j<2;j++)
+    tree(70+10*j+(5*Math.random()),0,-20-10*i+(5*Math.random()))
+}
+
 bush(70,0,10)
 bush(80,0,10)
 bush(75,0,15)
+forest(new THREE.Vector3(-40,0,-140),30)
