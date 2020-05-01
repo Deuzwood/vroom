@@ -12,9 +12,11 @@
 
         <%- include(`${path}`); %>
         
-        
         <%- include('inc/list_script'); %>
-
+    
+        <% if ( typeof script != "undefined") { %>
         <script src="/js/<%= script %>.js"></script>
+        <% } %>
+
     </body>
 </html>

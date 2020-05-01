@@ -3,7 +3,7 @@ exports.main = function(req, res) {
 };
 
 exports.index = function(req, res) {
-  res.render('layout_map',{ path: 'empty',script : 'sketch' });
+  res.render('layout_map',{ path: 'empty' });
 };
 
 exports.map = function(req, res) {
