@@ -42,3 +42,14 @@ if(last=='terrain1'){
     forest(new THREE.Vector3(-130-70,0,50+70),20)
 
 }
+else if(last == 'terrain4'){
+    let circuit = new Carte(map_4)
+    circuit.render();
+    terrain(new THREE.Vector3(0,0,0),new THREE.Vector3(100,0,100))
+
+    forest(new THREE.Vector3(45,0,45),20)
+    forest(new THREE.Vector3(70,0,-70),10)
+
+    forest(new THREE.Vector3(-75,0,25),15)
+
+}
