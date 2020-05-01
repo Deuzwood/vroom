@@ -6,7 +6,7 @@ exports.map = function(req, res) {
     res.render('layout_map',{ path: 'empty',script : 'map_script' });
   };
 
-exports.circuit_1 = function(req, res) {
+exports.circuit = function(req, res) {
   res.render('layout_map' ,{path: 'empty', script : 'map1'});
 }
 
