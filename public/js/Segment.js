@@ -37,10 +37,7 @@ class Segment {
 			this.diff = parseInt(param2[2])
 		}
 		 	
-
-
 	}
-
 
 
     render_r (){
@@ -67,7 +64,6 @@ class Segment {
 
 		collidable.push(side)
 		collidable.push(side2)
-		
 		
     
         /* ground */
@@ -111,8 +107,7 @@ class Segment {
 		road.receiveShadow = true;
 		scene.add(road)
 		AABB_road.push(new THREE.Box3().setFromObject(road))
-		scene.add(lampadaire((this.to.x+this.from.x)/2-10, (this.to.z+this.from.z)/2-10));
-
+		//scene.add(lampadaire((this.to.x+this.from.x)/2-10, (this.to.z+this.from.z)/2-10));
 		
 	}
 
@@ -123,7 +118,6 @@ class Segment {
         let x = this.from.x
         let y = this.from.y
 		let length = this.from.distanceTo(this.to)
-
 	
         /* side */ 
 		var geometry = new THREE.BoxGeometry( 1, 1, length )
@@ -140,8 +134,6 @@ class Segment {
 
 		collidable.push(side)
 		collidable.push(side2)
-		
-		
     
         /* ground */
 		geometry = new THREE.PlaneGeometry( w, length,length/2,length/5 )
@@ -170,14 +162,12 @@ class Segment {
 
 	render_cp (){
 		
-
         let road = new THREE.Object3D();
 		const w = W_ROAD;
 
 		let x = this.from.x
         let y = this.from.y
 		let length = this.from.distanceTo(this.to)
-	
 		
 		/**
 		 * box sur le coté
@@ -197,14 +187,10 @@ class Segment {
         var material = new THREE.MeshPhongMaterial({ color: CLR_SIDE });
 		let pan_up = new THREE.Mesh(geometry , material)
 		pan_up.position.y=8-0.4
-		
-	
 
 		road.add(pan)
 		road.add(pan2)
 		road.add(pan_up)
-		
-    
 
         /* side */ 
         var geometry = new THREE.BoxGeometry( 1, 1, length )
@@ -409,8 +395,6 @@ class Segment {
 		t.name = 'curveT'+this.from.x+','+this.from.y+','+this.from.z
 		t.add(curve)
 
-		
-
 		scene.add(t)
 		
 		//t.rotation.y-=THREE.Math.degToRad(90)
@@ -467,7 +451,6 @@ class Segment {
 			curveSegments: this.length
 		};
 		
-
 		var shape = new THREE.Shape();
 		shape.moveTo(0,0);
 		shape.bezierCurveTo(0,this.length/2,this.diff,this.length/2,this.diff,this.length);
@@ -479,7 +462,6 @@ class Segment {
 		mesh.position.x-=w/2+0.1
 		bezier.add( mesh );
 		
-
 		/* ground */
 		var shape = new THREE.Shape();
 		/*shape.moveTo(0, 0);
@@ -492,12 +474,9 @@ class Segment {
 		shape.lineTo(this.diff-w,this.length);
 		shape.bezierCurveTo(this.diff-w,this.length/2,-w,this.length/2,-w,0);   
 
-
-
 		var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: CLR_GROUND }));
 		bezier.add( mesh );
-
 
 		//bezier.rotation.x-=THREE.Math.degToRad(90)
 		//bezier.name = 'curve'+this.from.x+','+this.from.y+','+this.from.z
@@ -507,12 +486,9 @@ class Segment {
 		//scene.add(bezier)
 		//scene.getObjectByName( 'bezier'+this.from.x+','+this.from.y+','+this.from.z).position.set(this.from.x,this.from.y,this.from.z);
 
-
 		let t = new THREE.Object3D();
 		//t.name = 'bezierT'+this.from.x+','+this.from.y+','+this.from.z
 		t.add(bezier).position.set(this.from.x,this.from.y,this.from.z);
-
-		
 
 		scene.add(t)
 		t.rotation.x-=THREE.Math.degToRad(90)
