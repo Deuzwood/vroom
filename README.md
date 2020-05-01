@@ -1,22 +1,31 @@
 # Vroom
 
-Socket.io & ThreeJS web app.
+Multiplayer cars game with  [Socket.io](http://socket.io/) and [Three.js](http://threejs.org/)
 
-Herokuapp Ready
+Herokuapp ready
 
+### Prerequisites
+- npm
+- nodejs
 
+## Install
 
-## Map
+Installation des modules avec **npm**
 
+```
+npm install
+```
 
+## Usage
 
-## Color
+```
+npm run start
+```
+With nodemon : 
+```
+npm run dev
+```
 
-Green
+## Author
 
-#3f4f44
-#7da188
-#225732
-#508560
-
-https://jsfiddle.net/prisoner849/4gnm8bw3/
+Nicolas Wallet
