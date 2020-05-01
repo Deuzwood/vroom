@@ -8,6 +8,9 @@ class Carte{
         this.checkpoints = []
         this.cp = []
         this.navigable = []
+
+        //Index des segment boost
+        this.boost = []
         this.nb_turn = DEFAULT_NB_TURN
 
         /*Position*/
@@ -131,6 +134,7 @@ class Carte{
 
             }
             if(shape=="boost"){
+                this.boost.push(this.segments.length)
                 this.segments.push( new Segment(type,shape,new THREE.Vector3(position.x,position.y,position.z),new THREE.Vector3(next_position.x,next_position.y,next_position.z)))
 
             }
