@@ -59,7 +59,7 @@ let KeyBindings = {
 Object.keys(KeyBindings).forEach( key => {
 	document.querySelector('#key_'+key).innerText = (KeyBindings[key].key).toUpperCase().replace("ArrownUp","Fleche Haut").replace("ArrownDown","Fleche Bas")
 	document.querySelector('#key_'+key).addEventListener('click' , event => {
-		document.querySelector('#key_'+key).classList = "border border-warning";
+		document.querySelector('#key_'+key).classList = "btn btn-outline-warning";
 		document.querySelector('#key_'+key).innerText = "Appuyer sur une touche ";
 		 let change = event => { 
 			document.querySelector('#key_'+key).innerText = event.key.toUpperCase();
@@ -74,7 +74,7 @@ Object.keys(KeyBindings).forEach( key => {
 
 			KeyBindings[key].code = event.code
 			KeyBindings[key].key = event.key
-			document.querySelector('#key_'+key).classList = "border border-secondary"
+			document.querySelector('#key_'+key).classList = "btn btn-outline-secondary"
 		}
 		document.addEventListener('keydown', change, {once : true})
 	})
