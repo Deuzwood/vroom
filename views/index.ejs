@@ -28,30 +28,41 @@
         <div class="form-group">
             <label for="map">Sélectionnez une carte : </label>
             <div class="row"> 
-                <div class="col-sm-4">
-                    <div class="card border-success" id="server1">
-                        <img class="card-img-top" src="/img/map_1.png" alt="Carte numero 1">
-                        <div class="card-body">
-                        <p class="card-text">Circuit simple avec quelques virages techniques.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="card" id="server2">
-                        <img class="card-img-top" src="/img/map_2.png" alt="Pas d'image">
-                        <div class="card-body">
-                        <p class="card-text">En construction.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="card" id="server3">
-                        <img class="card-img-top" src="/img/map_3.png" alt="Pas d'image">
-                        <div class="card-body">
-                        <p class="card-text">Quelques virages, et des boosts</p>
-                        </div>
-                    </div>
-                </div>
+
+                <script> 
+                for(let i=1;i<5;i++){
+
+                    let col = document.createElement('div');
+                    col.classList = 'col-sm-3'
+
+                    let card = document.createElement('div');
+                    card.id = 'server'+i;
+                    card.classList ='card'
+                    if(i==1)
+                        card.classList='card border-success'
+
+                    let img = document.createElement('img')
+                    img.src = '/img/map_'+i+'.png'
+                    img.classList='card-img-top'
+
+                    let card_body = document.createElement('div');
+                    card_body.classList ='card-body'
+
+                    let h5 = document.createElement('h5');
+                    h5.classList ='card-title text-center'
+                    h5.innerText = 'Serveur '+i 
+
+                    card_body.appendChild(h5)
+                    card.appendChild(card_body)
+                    card.appendChild(img)
+                    col.appendChild(card)
+
+                    document.querySelector('.row').appendChild(col)
+                }
+                
+                </script>
+
+        
             </div>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Rejoindre</button>
