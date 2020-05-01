@@ -85,6 +85,7 @@ function tree(x,y,z){
     }
 
     tree.position.set(x,y,z);
+    tree.castShadow = true;
     scene.add(tree);
 }
 
@@ -124,5 +125,6 @@ function bush(x,y,z){
     }
 
     bush.position.set(x,y,z);
+    bush.rotation.y = Math.random()
     scene.add(bush);
 }
