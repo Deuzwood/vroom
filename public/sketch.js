@@ -11,18 +11,46 @@ let mov = {};
 let f = true;
 let speed = 0;
 var socket;
+
+/* Notre voiture (stats) */
+car_stats = {
+    acceleration: 0.008,
+    resistance : 0.004,
+    speed : 0,
+	maxSpeed : 1.2,
+	maxSpeed_boost : 1.8,
+    maxBack : 0.30,
+    steerAngle:{
+        current:0,
+        max:2,
+        change:1,
+        toR : function(){
+            return this.current * Math.PI/180;
+        }
+    }
+}
+
+
+/* Pour nos stat et cp */
 let checkpoints = []
+let inc=0;
+let times = [];
+let clock = new THREE.Clock();
+clock.start();
+
+
 let item = true;
 var car_box;
 let carte
 let KeyBindings = {
-	forward : {function : "forward" , code : "ArrowUp" , key : "ArrowUp" },
-	backward : {function : "backward" , code : "ArrowDown" , key : "ArrowDown" },
-	left : {function : "left" , code : "ArrowLeft" , key : "ArrowLeft" },
-	right : {function : "right" , code : "ArrowRight" , key : "ArrowRight" },
+	forward : { code : "ArrowUp" , key : "ArrowUp" },
+	backward : { code : "ArrowDown" , key : "ArrowDown" },
+	left : { code : "ArrowLeft" , key : "ArrowLeft" },
+	right : { code : "ArrowRight" , key : "ArrowRight" },
 
-	camera : {function : "camera" , code : "KeyQ" , key : "a" },
-	respawn : {function : "respawn" , code : "keyR" , key : "r" },
+	camera : { code : "KeyQ" , key : "a" },
+	respawn : { code : "KeyR" , key : "r" },
+	restart : { code : "KeyY" , key : "y" },
 }
 /**
  * KeyBindings 
@@ -34,10 +62,10 @@ Object.keys(KeyBindings).forEach( key => {
 		document.querySelector('#key_'+key).classList = "border border-warning";
 		document.querySelector('#key_'+key).innerText = "Appuyer sur une touche ";
 		 let change = event => { 
-			document.querySelector('#key_'+key).innerText = event.key;
+			document.querySelector('#key_'+key).innerText = event.key.toUpperCase();
 
-			/*KeyBindings.forEach( k => {
-				if(k.code == event.code){
+			/*Object.keys(KeyBindings).forEach( k => {
+				if(KeyBindings[k].code == event.code){
 					document.querySelector('#key_'+k).classList = "border border-danger";
 					document.querySelector('#key_'+key).classList = "border border-danger";
 					console.log(key+' '+k)
@@ -47,15 +75,14 @@ Object.keys(KeyBindings).forEach( key => {
 			KeyBindings[key].code = event.code
 			KeyBindings[key].key = event.key
 			document.querySelector('#key_'+key).classList = "border border-secondary"
-		 	//document.removeEventListener('keypress', change, false)
 		}
-		document.addEventListener('keypress', change, {once : true})
-
-			
+		document.addEventListener('keydown', change, {once : true})
 	})
 })
 
-
+/* check support gamepads 
+// Pas implementer pour le moment
+*/
 function supportsGamepads() {
     return !!(navigator.getGamepads);
 }
@@ -191,7 +218,7 @@ let init_control = () => document.addEventListener('keydown', (event) => {
 	mov[event.code]= true
 
 		//Camera
-		if (event.code === 'KeyQ') {
+		if (event.code === KeyBindings.camera.code) {
 			if(cam == 0)
 			{
 				camera.position.z = -30;
@@ -208,10 +235,12 @@ let init_control = () => document.addEventListener('keydown', (event) => {
 			cam= (cam+1)%3;
 		}
 		
-		if(event.code === "KeyR"){
+		if(event.code === KeyBindings.respawn.code){
 			respawn()
 		}
-	
+		if(event.code === KeyBindings.restart.code){
+			restart()
+		}
 	});
 
 
@@ -253,24 +282,24 @@ function animate() {
 			respawn();
 	}else{*/
 
-		if (mov[KeyBindings.forward.code] /*&& isCorrect()*/) {
-            car_stats.enginePower = Math.min(car_stats.maxEnginePower, car_stats.enginePower + car_stats.acceleration);
+		if ( mov[KeyBindings.forward.code] ) {
+            car_stats.speed = Math.min(car_stats.maxSpeed, car_stats.speed + car_stats.acceleration);
         } else if (mov[KeyBindings.backward.code]) {
-            car_stats.enginePower = Math.max(-car_stats.maxReverseEnginePower, car_stats.enginePower - car_stats.acceleration);
+            car_stats.speed = Math.max(-car_stats.maxBack, car_stats.speed - car_stats.acceleration);
         }
-        if (mov[KeyBindings.left.code] && !mov[KeyBindings.right.code]) {
+        if ( mov[KeyBindings.left.code] && !mov[KeyBindings.right.code]) {
             car_stats.steerAngle.current = Math.min(car_stats.steerAngle.max, car_stats.steerAngle.current + car_stats.steerAngle.change);
         } else if (mov[KeyBindings.right.code] && !mov[KeyBindings.left.code]) {
             car_stats.steerAngle.current = Math.max(-car_stats.steerAngle.max, car_stats.steerAngle.current - car_stats.steerAngle.change);
         }
     
-        car_stats.enginePower > 0 ? car_stats.enginePower = Math.max(0, car_stats.enginePower - car_stats.resistance) : car_stats.enginePower = Math.min(0, car_stats.enginePower + car_stats.resistance);
+        car_stats.speed > 0 ? car_stats.speed = Math.max(0, car_stats.speed - car_stats.resistance) : car_stats.speed = Math.min(0, car_stats.speed + car_stats.resistance);
     
         car_stats.steerAngle.current = car_stats.steerAngle.current > 0 ? Math.max(0, car_stats.steerAngle.current - car_stats.steerAngle.change / 2) : Math.min(0, car_stats.steerAngle.current + car_stats.steerAngle.change / 2);
     
-        car.position.x += Math.sin(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.enginePower ;
-        car.position.z += Math.cos(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.enginePower ;
-        car.rotation.y = car.rotation.y % (2 * Math.PI) + car_stats.steerAngle.toR() * car_stats.enginePower;
+        car.position.x += Math.sin(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
+        car.position.z += Math.cos(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
+        car.rotation.y = car.rotation.y % (2 * Math.PI) + car_stats.steerAngle.toR() * car_stats.speed;
 	
 	
 	
@@ -310,6 +339,8 @@ function animate() {
 
 		stats(mov[KeyBindings.forward.code]);
 
+		// D'après l'exemple de Lee Stemkoski sur le raycaster collision
+		// https://stemkoski.github.io/Three.js/Collision-Detection.html
 		var originPoint = car_box.position.clone();
 		for (var vertexIndex = 0; vertexIndex < car_box.geometry.vertices.length; vertexIndex++)
 		{		
@@ -325,7 +356,7 @@ function animate() {
 				//console.log(directionVector)
 				let v = new THREE.Vector2(directionVector.x,directionVector.z)
 
-				car_stats.enginePower=0
+				car_stats.speed=0
 
 				car_stats.steerAngle.current=v.angle()//+THREE.Math.degToRad(90)
 			}
@@ -346,8 +377,8 @@ function animate() {
 						inter.push(i)
 				}
 		})	
-		if(inter[0] == 8)
-			car_stats.enginePower *= 1.04 
+		if(carte.boost.includes(inter[0]))
+			car_stats.speed *= 1.04 
 
 	//}
 
@@ -394,8 +425,8 @@ if(mine)
 function isCorrect(){
 	// on calcule la prochaine position
 	let r = true;
-	let x =car.position.x + Math.sin(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.enginePower ;
-	let z =car.position.x + Math.cos(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.enginePower ;
+	let x =car.position.x + Math.sin(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
+	let z =car.position.x + Math.cos(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
 	bordermap.forEach( border => {
 		let tmp = new THREE.Box3()
 		tmp.setFromObject(border)
@@ -403,11 +434,11 @@ function isCorrect(){
 			r = false;
 	})
 	if(!r){
-		car_stats.enginePower /= 2
+		car_stats.speed /= 2
 
-		car.position.x += Math.sin(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.enginePower ;
-        car.position.z += Math.cos(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.enginePower ;
-       // car.rotation.y = THREE.Math.degToRad(90) // car.rotation.y % (2 * Math.PI) + car_stats.steerAngle.toR() * car_stats.enginePower;
+		car.position.x += Math.sin(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
+        car.position.z += Math.cos(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
+       // car.rotation.y = THREE.Math.degToRad(90) // car.rotation.y % (2 * Math.PI) + car_stats.steerAngle.toR() * car_stats.speed;
 	}
 		
 
@@ -450,20 +481,46 @@ function isPool(position){
 	pos = new THREE.Vector3(position.x,position.y,position.z);
 	return  !((pos.z>40 || pos.z<-40) || (pos.x>40 || pos.x<-40))
 }
+
+/**
+ * Respawn au dernier checkpoint
+ * Dans la bonne position et avec une vitesse nulle
+ */
 function respawn(){
-	let i = checkpoints.lastIndexOf(1);
-	if(i != -1){
-		car.position.y=2;
-		car.position.x=carte.checkpoints[i].x;
-		car.position.z=carte.checkpoints[i].z
-		//On applique la rotation du cp pour être 'face' au cp
-		car.rotation.y=THREE.Math.degToRad(carte.checkpoints[i].facing*90 + 90);
-		car.rotation.z=0;
-		car.rotation.x=0;
-		//reset speed
-	car_stats.enginePower=0
-	}
+	let i = checkpoints.lastIndexOf(1) == -1 ? 0 : checkpoints.lastIndexOf(1) ;
+	console.log('respawn called')
+
+	car.position.y=2;
+	car.position.x=carte.checkpoints[i].x;
+	car.position.z=carte.checkpoints[i].z
+	//On applique la rotation du cp pour être 'face' au cp
+	car.rotation.y=THREE.Math.degToRad(carte.checkpoints[i].facing*90 + 90);
+	car.rotation.z=0;
+	car.rotation.x=0;
+	//reset speed
+	car_stats.speed=0
 	
+}
+
+/**
+ * Recommence la partie
+ * On reset le temps , les cp et on respawn 
+ */
+function restart(){
+	checkpoints = new Array(carte.cp.length).fill(0);
+	inc=0;
+	times = [];
+	clock = new THREE.Clock();
+	clock.start();
+	stats()
+
+	/** Update gui */
+	document.querySelector('#nbtour').innerText = 0;
+	document.querySelector('#inc').innerText = 0;
+	document.querySelector('#last_time').innerText = 'Aucun';
+	document.querySelector('#best_time').innerText = 'Aucun';
+
+	respawn();
 }
 
 
@@ -521,17 +578,12 @@ document.querySelector('#log').addEventListener('submit', event => {
  * On pourra modifier notre gui plus simplement
  *
  */
-let inc=0;
-
-let times = [];
-let clock = new THREE.Clock();
-clock.start();
-function stats(up){
+function stats(up=0){
 	inc++;
 	if(up)
 		document.querySelector('#inc').innerText = parseInt(document.querySelector('#inc').innerText)+1
 
-	document.querySelector('#speed').innerText = (car_stats.enginePower*100).toFixed(0)
+	document.querySelector('#speed').innerText = (car_stats.speed*100).toFixed(0)
 
 	//checkpoints, à chaque coin , a met le checkpoints à 1 pour etre sur qu'il ne fait pas demi tour.
 
