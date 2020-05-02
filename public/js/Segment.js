@@ -345,7 +345,7 @@ class Segment {
 		/* Line */
 		if(this.size!=1){
 			var shape = new THREE.Shape();
-			shape.moveTo(0, w/2);
+			shape.moveTo(0, w/2+0.1);
 			shape.quadraticCurveTo(this.size*w-w/2, 0+w/2, this.size*w-w/2-0.5+0.4, this.size*w);
 			shape.lineTo((this.size-1)*w+w/2-0.5-0.4,(this.size)*w);
 			shape.quadraticCurveTo((this.size-1)*w+w/2-0.5-0.4, w-w/2+0.5+0.4, 0,w-w/2+0.5+0.4);
