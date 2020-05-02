@@ -342,14 +342,13 @@ class Segment {
 			curveSegments: 10*this.size
 		};
 		
-		
 		/* Line */
 		if(this.size!=1){
 			var shape = new THREE.Shape();
-			shape.moveTo(0, w/2-0.2);
-			shape.quadraticCurveTo(this.size*w-w/2+0.2, 0+w/2-0.2, this.size*w-w/2+0.2, this.size*w);
-			shape.lineTo((this.size-1)*w+w/2-0.2,(this.size)*w);
-			shape.quadraticCurveTo((this.size-1)*w+w/2-0.2, w-w/2+0.2, 0,w-w/2+0.2);
+			shape.moveTo(0, w/2);
+			shape.quadraticCurveTo(this.size*w-w/2, 0+w/2, this.size*w-w/2-0.5+0.4, this.size*w);
+			shape.lineTo((this.size-1)*w+w/2-0.5-0.4,(this.size)*w);
+			shape.quadraticCurveTo((this.size-1)*w+w/2-0.5-0.4, w-w/2+0.5+0.4, 0,w-w/2+0.5+0.4);
 			var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 			var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: CLR_LINE }));
 			mesh.position.z+=0.01
