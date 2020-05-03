@@ -89,3 +89,26 @@ const map_4 = [
     'curve 4 r',
     'bezier 59 11',
 ]
+
+const map_5 = [
+    'checkpoint',
+    'curve 5 r',
+    'linear 50',
+    'boost 20',
+    'linear 20',
+    'bezier 50 15',
+    'checkpoint',
+    'bezier 50 -15',
+    'curve 5 r',
+    'curve 5 r',
+    'bezier 50 15',
+    'checkpoint',
+    'linear 40',
+    'curve 6 l',
+    'curve 4 r',
+    'curve 4 r',
+    'linear 10',
+    'boost 20',
+    'linear 10',
+    'bezier 74 11'
+]

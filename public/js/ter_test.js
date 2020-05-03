@@ -45,11 +45,20 @@ if(last=='terrain1'){
 else if(last == 'terrain4'){
     let circuit = new Carte(map_4)
     circuit.render();
-    terrain(new THREE.Vector3(0,0,0),new THREE.Vector3(100,0,100))
+    terrain(new THREE.Vector3(0,0,0),new THREE.Vector3(100,0,100),new THREE.Box3(new THREE.Vector3(-100,-20,10), new THREE.Vector3(70,40,80)))
 
     forest(new THREE.Vector3(45,0,45),20)
     forest(new THREE.Vector3(70,0,-70),10)
 
     forest(new THREE.Vector3(-75,0,25),15)
+
+}else if(last == 'terrain5'){
+    let circuit = new Carte(map_5)
+    circuit.render();
+    terrain(new THREE.Vector3(0,0,0),new THREE.Vector3(100,0,100), new THREE.Box3(new THREE.Vector3(-120,-20,0), new THREE.Vector3(10,40,80)))
+
+    forest(new THREE.Vector3(10,0,285),30)
+    forest(new THREE.Vector3(30,0,40),20)
+    forest(new THREE.Vector3(-130,0,40),20)
 
 }
