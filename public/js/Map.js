@@ -4,13 +4,19 @@ class Carte{
      * @param {...} value - 
      */
     constructor(...args){
+
+        //Liste des segments de notre carte
         this.segments = []
+
+        // Checkpoint contient les position pour le respawn
         this.checkpoints = []
+        // et cp les AABB box des cp
         this.cp = []
-        this.navigable = []
 
         //Index des segment boost
         this.boost = []
+
+        // Nombre de tour à réaliser
         this.nb_turn = DEFAULT_NB_TURN
 
         /*Position*/
@@ -18,7 +24,12 @@ class Carte{
         let next_position={x:0,y:0,z:0};
         let align=0;
         
-
+        /**
+         * Deux possiblité pour créer une carte on peut faire 
+         * new Carte( [] ou element1,element2
+         * mais on veut traiter une iteration donc si on obtient un [] 
+         * on rectifie
+         */
         if(typeof args[0] ==="object"){
             args = args[0]
         }
@@ -55,11 +66,12 @@ class Carte{
             }
             else{
                 segment = segment.split(' ')
-             type = 'road'
-             shape = segment[0];
-             length = segment[1]
+                type = 'road'
+                shape = segment[0];
+                length = segment[1]
             }
-            
+        
+            // Calcule des positions
             if(shape=="linear" || shape=="tunnel" || shape=="boost"){
                 next_position.x += length*Math.cos(THREE.Math.degToRad(align*90))
                 next_position.z += -length*Math.sin(THREE.Math.degToRad(align*90))
@@ -68,7 +80,6 @@ class Carte{
                 next_position.z += -length*Math.sin(THREE.Math.degToRad(align*90))+segment[2]*Math.cos(THREE.Math.degToRad(align*90))
             }else if(shape=="curve"){
                 let side  = segment[2] == "l" ? 1 : 0;
-
                 let f =THREE.Math.degToRad((side+align)*90);
 
                 next_position.x+= (W_ROAD*length-W_ROAD/2-0.5)*(Math.cos(f)+Math.sin(f))
@@ -115,33 +126,26 @@ class Carte{
    
     }
 
-
+    /***
+     * Render va afficher la map.
+     * Elle affiche donc tout les segments un par un
+     */
     render = function() {
-    this.segments.forEach(segment => {
-            if(segment.shape=='linear' || segment.shape == "end" || segment.shape=='tunnel'){
-                segment.render_r()
-            }
-            else if(segment.shape=='intersect'){
-                segment.render_i()
-            }
-            else if(segment.shape=='curve'){
-                segment.render_c()
-            }
-            else if(segment.shape=='cp'){
-                segment.render_cp()
-            }
-            else if(segment.shape=='bezier'){
-                segment.render_bezier()
-            }
-            else if(segment.shape=='boost'){
-                segment.render_boost()
-            }
+        this.segments.forEach(segment => {
+            segment.render()
         })
     } 
 
 }
 
-
+/**
+ *  J'avais besoin de vrai modulo ( fonction euclidienne )
+ * pour la var 'align'
+ * car le mod de js ( % ) peut retourner un negatif
+ * 
+ * Le code suivant provient de cette page
+ * https://blog.smarchal.com/modulo-en-js#fonction-euclidienne 
+ */
 Number.prototype.mod = function(n) {
 	var m = (( this % n) + n) % n;
 	return m < 0 ? m + Math.abs(n) : m;
