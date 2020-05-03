@@ -7,7 +7,7 @@ exports.index = function(req, res) {
 };
 
 exports.map = function(req, res) {
-    res.render('layout_map',{ path: 'empty',script : 'map_script' });
+    res.render('layout_map',{ path: 'empty',script : 'seg_test' });
   };
 
 exports.circuit = function(req, res) {

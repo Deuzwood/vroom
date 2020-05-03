@@ -10,7 +10,7 @@ const dir = '/test/';
 
 router.get(dir+'', indexController.index);
 
-router.get(dir+'map', indexController.map);
+router.get(dir+'segment:name', indexController.map);
 
 router.get(dir+'map:id', indexController.circuit);
 

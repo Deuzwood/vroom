@@ -11,6 +11,7 @@ body{
     grid-template-rows: 1fr;
     grid-column-gap: 0px;
     grid-row-gap: 0px;
+
     }
     
 .nav { 
@@ -20,18 +21,21 @@ body{
 .div2 { grid-area: 1 / 2 / 2 / 3; }
 
 a{
-    display: block;
     text-decoration: none;
     color: grey;
     font-family: "Lucida Console", monospace;
     font-size: 18px;
-    letter-spacing: 1.4px;
     color: #777777;
-    font-weight: 800;
+    font-weight: 600;
     text-decoration: none solid rgb(68, 68, 68);
     font-variant: small-caps;
     text-transform: capitalize;
     padding-left: 20px;
+}
+
+
+.link>a{
+    display: block;
 }
 a:visited{
     color: grey;
