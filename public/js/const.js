@@ -19,6 +19,7 @@ const CLR_LEAVES = 0x264d00;
 const CLR_LEAVES_VAR1 = 0x003300;
 const CLR_LEAVES_VAR2 = 0xffccff; // cerisier
 const CLR_WOOD = 0x663300;
+const CLR_WOOD_VAR1 = 0x734d26;
 
 /* Terrain */
 const CLR_GRASS = 0x317d32;
