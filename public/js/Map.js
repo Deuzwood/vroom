@@ -71,48 +71,9 @@ class Carte{
 
                 let f =THREE.Math.degToRad((side+align)*90);
 
-                next_position.x+= (W_ROAD*length-W_ROAD/2-0.5)*(Math.cos(f)+Math.sin(f))//-6-0.5
-                next_position.z+= (W_ROAD*length-W_ROAD/2-0.5)*(Math.cos(f)-Math.sin(f))//-6-0.5
-            }else if(shape=="curve"){
-                //let side  = segment[2] == "l" ? 1 : 0;
-
-                //let f =THREE.Math.degToRad((side+align)*90);
-
-                //next_position.x+= (W_ROAD*length-W_ROAD/2-0.5)*(Math.cos(f)+Math.sin(f))//-6-0.5
-                //next_position.z+= (W_ROAD*length-W_ROAD/2-0.5)*(Math.cos(f)-Math.sin(f))//-6-0.5
+                next_position.x+= (W_ROAD*length-W_ROAD/2-0.5)*(Math.cos(f)+Math.sin(f))
+                next_position.z+= (W_ROAD*length-W_ROAD/2-0.5)*(Math.cos(f)-Math.sin(f))
             }
-
-/*
-            var geometry = new THREE.SphereGeometry( 0.5, 1, 1 );
-            var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
-            var sphere = new THREE.Mesh( geometry,material);
-            sphere.position.set(next_position.x,0,next_position.z)
-            scene.add(sphere)
-
-            var geometry = new THREE.SphereGeometry( 5, 1, 1 );
-            var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
-            var sphere = new THREE.Mesh( geometry,material);
-            sphere.position.set(100,0,0)
-            scene.add(sphere)
-
-            var geometry = new THREE.SphereGeometry( 5, 1, 1 );
-            var material = new THREE.MeshBasicMaterial( {color: 0x00ffff} );
-            var sphere = new THREE.Mesh( geometry,material);
-            sphere.position.set(0,0,100)
-            scene.add(sphere)
-
-            var geometry = new THREE.SphereGeometry( 5, 1, 1 );
-            var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-            var sphere = new THREE.Mesh( geometry,material);
-            sphere.position.set(-100,0,0)
-            scene.add(sphere)
-
-            var geometry = new THREE.SphereGeometry( 5, 1, 1 );
-            var material = new THREE.MeshBasicMaterial( {color: 0x003300} );
-            var sphere = new THREE.Mesh( geometry,material);
-            sphere.position.set(0,0,-100)
-            scene.add(sphere)
-*/
 
             if(shape=="end"){
                 this.segments.push( new Segment(type,'linear',new THREE.Vector3(position.x,position.y,position.z),new THREE.Vector3(0,0,0)))
