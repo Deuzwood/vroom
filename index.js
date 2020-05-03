@@ -31,18 +31,17 @@ io.on('connection', function(socket){
 
   socket.on('player', (name,color,server) =>{
     socket.join(server)
-    console.log('Join on server'+server)
-    io.to(server).emit('cl', 'you join '+server)
     io.to(server).emit('new', socket.id,name,color);
     player.forEach( element => {
-      if(element.server == server)
+      if(element.socket.server == server)
         socket.emit('new', element.socket.id,element.name,element.color)
     })
-    player.push({socket:socket,name:name,color:color,server:server})
+    socket.server=server
+    player.push({socket:socket,name:name,color:color})
   })
 
-  socket.on('move', function(x,z,r_y){
-      socket.broadcast.to(socket.rooms['server3']).emit('move', socket.id,x,z,r_y);
+  socket.on('move', function(x,z,r_y,room){
+      socket.broadcast.to(socket.rooms[socket.server]).emit('move', socket.id,x,z,r_y);
   });
 
 
