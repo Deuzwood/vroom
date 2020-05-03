@@ -11,7 +11,7 @@ exports.map = function(req, res) {
   };
 
 exports.circuit = function(req, res) {
-  res.render('layout_map' ,{path: 'empty', script : 'map1'});
+  res.render('layout_map' ,{path: 'empty', script : 'map_test'});
 }
 
 exports.mine = function(req, res) {
