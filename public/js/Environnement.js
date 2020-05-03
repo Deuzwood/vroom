@@ -145,11 +145,13 @@ function bush(x,y,z,r=false){
 
 function forest(pos, radius){
     let forest = new THREE.Object3D();
-    for(let i=0;i<radius*2;i++){
+    let density = 1/20;
+
+    for(let i=0;i<radius*radius*density;i++){
         let angle = 2*Math.random()*Math.PI;
-        let raduis_sq = Math.random()*radius*radius;
-        let x = Math.sqrt(raduis_sq)*Math.cos(angle);
-        let y = Math.sqrt(raduis_sq)*Math.sin(angle);
+        let radius_sq = Math.random()*radius*radius;
+        let x = Math.sqrt(radius_sq)*Math.cos(angle);
+        let y = Math.sqrt(radius_sq)*Math.sin(angle);
         if(Math.random()>0.3)
             forest.add(tree(x, 0 ,y,true))
         else
