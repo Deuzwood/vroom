@@ -11,6 +11,7 @@ let mov = {};
 let f = true;
 let speed = 0;
 var socket;
+let server;
 
 /* Notre voiture (stats) */
 car_stats = {
@@ -20,16 +21,13 @@ car_stats = {
 	maxSpeed : 1.2,
 	maxSpeed_boost : 1.8,
     maxBack : 0.30,
-    steerAngle:{
-        current:0,
-        max:2,
-        change:1,
-        toR : function(){
-            return this.current * Math.PI/180;
-        }
-    }
+
+	rotation : 2,
+	inc : 0.2,
+	angle : 0,
 }
 
+var fleche;
 
 /* Pour nos stat et cp */
 let checkpoints = []
@@ -51,6 +49,8 @@ let KeyBindings = {
 	camera : { code : "KeyQ" , key : "a" },
 	respawn : { code : "KeyR" , key : "r" },
 	restart : { code : "KeyY" , key : "y" },
+
+	players : { code : "KeyN" , key : "n" },
 }
 /**
  * KeyBindings 
@@ -87,7 +87,7 @@ function supportsGamepads() {
     return !!(navigator.getGamepads);
 }
 
-function init(color=0x000000,map_name) {
+function init(color=0x000000) {
 	let colord = color
 	//Camera
 	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 300 );
@@ -99,10 +99,10 @@ function init(color=0x000000,map_name) {
 	//Scene
 	scene = new THREE.Scene();
 
+	var spotLight = new THREE.SpotLight( {color:0xffffff,intensity:2,distance:200} );
+	spotLight.position.set( 0, 180, 0 );
+	scene.add( spotLight );
 	
-	
-	var lightAmb = new THREE.AmbientLight(0xffffff);
-	scene.add(lightAmb);
 
 
 	// car 
@@ -129,6 +129,21 @@ MTLLoader.load( 'ressources/Low_Poly_Sportcar.mtl',
 	}
 );
 
+ geometry = new THREE.Geometry();
+
+geometry.vertices.push(
+	new THREE.Vector3( 5,  0, 0 ),
+	new THREE.Vector3( 0, 0, 2 ),
+	new THREE.Vector3(  0, 0, -2 )
+);
+
+geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+geometry.computeBoundingSphere();
+fleche = new THREE.Mesh(geometry , new THREE.MeshBasicMaterial({color : 0xff00ff, side:THREE.DoubleSide}))
+
+scene.add(fleche)
+
+
 
 /*
 test.forEach( (element,i) => {
@@ -145,7 +160,7 @@ console.log(boxs)
 */
 
 
-var cubeGeometry = new THREE.CubeGeometry(3,2,5.4,1,1,1);
+var cubeGeometry = new THREE.CubeGeometry(2.8,2,5.4,1,1,1);
 	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe:true } );
 	car_box = new THREE.Mesh( cubeGeometry, wireMaterial );
 	scene.add( car_box );
@@ -159,32 +174,32 @@ car.add(camera)
 scene.add(car)
 
 vec = new THREE.Box3(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0))
-
-
-
 scene.background = new THREE.Color(0x444444)
 
-
-	console.log(map_name)
-	if(map_name=="server1"){
+	if(server=="server1"){
 		console.log("render server1")
 		carte = new Carte(map_1)
 
 	}
-	if(map_name=="server2"){
+	if(server=="server2"){
 		console.log("render server2")
 		carte = new Carte(map_2)
 
 	}
 
-	if(map_name=="server3"){
+	if(server=="server3"){
 		console.log("render server3")
 		carte = new Carte(map_3)
 
 	}
-	if(map_name=="server4"){
+	if(server=="server4"){
 		console.log("render server4")
 		carte = new Carte(map_4)
+
+	}
+	if(server=="server5"){
+		console.log("render server5")
+		carte = new Carte(map_5)
 
 	}
 
@@ -227,15 +242,18 @@ let init_control = () => document.addEventListener('keydown', (event) => {
 			if(cam == 0)
 			{
 				camera.position.z = -30;
-				camera.position.y = 20;
+				camera.position.y = 30;
+				camera.rotation.x = -2.50
 			}
 			else if(cam == 1){
 				camera.position.z = 1.15;
 				camera.position.y = 2;
+				camera.rotation.x = -2.70
 			}
 			else{
 				camera.position.z = 4;
 				camera.position.y = 1;
+				camera.rotation.x = -2.70
 			}
 			cam= (cam+1)%3;
 		}
@@ -245,6 +263,14 @@ let init_control = () => document.addEventListener('keydown', (event) => {
 		}
 		if(event.code === KeyBindings.restart.code){
 			restart()
+		}
+		if(event.code === KeyBindings.players.code){
+			other.forEach(
+				player => {
+					scene.getObjectByName(player).visible = !scene.getObjectByName(player).visible
+				}
+			)
+			socket.off('move')
 		}
 	});
 
@@ -286,25 +312,25 @@ function animate() {
 		if(car.rotation.z<-0.8)
 			respawn();
 	}else{*/
-
+		fleche.position.set(car.position.x,4,car.position.z)
 		if ( mov[KeyBindings.forward.code] ) {
             car_stats.speed = Math.min(car_stats.maxSpeed, car_stats.speed + car_stats.acceleration);
         } else if (mov[KeyBindings.backward.code]) {
             car_stats.speed = Math.max(-car_stats.maxBack, car_stats.speed - car_stats.acceleration);
         }
         if ( mov[KeyBindings.left.code] && !mov[KeyBindings.right.code]) {
-            car_stats.steerAngle.current = Math.min(car_stats.steerAngle.max, car_stats.steerAngle.current + car_stats.steerAngle.change);
+            car_stats.angle = Math.min(car_stats.rotation, car_stats.angle + car_stats.inc);
         } else if (mov[KeyBindings.right.code] && !mov[KeyBindings.left.code]) {
-            car_stats.steerAngle.current = Math.max(-car_stats.steerAngle.max, car_stats.steerAngle.current - car_stats.steerAngle.change);
+            car_stats.angle = Math.max(-car_stats.rotation, car_stats.angle - car_stats.inc);
         }
     
         car_stats.speed > 0 ? car_stats.speed = Math.max(0, car_stats.speed - car_stats.resistance) : car_stats.speed = Math.min(0, car_stats.speed + car_stats.resistance);
     
-        car_stats.steerAngle.current = car_stats.steerAngle.current > 0 ? Math.max(0, car_stats.steerAngle.current - car_stats.steerAngle.change / 2) : Math.min(0, car_stats.steerAngle.current + car_stats.steerAngle.change / 2);
+        car_stats.angle = car_stats.angle > 0 ? Math.max(0, car_stats.angle - car_stats.inc / 2) : Math.min(0, car_stats.angle + car_stats.inc / 2);
     
-        car.position.x += Math.sin(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
-        car.position.z += Math.cos(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
-        car.rotation.y = car.rotation.y % (2 * Math.PI) + car_stats.steerAngle.toR() * car_stats.speed;
+        car.position.x += Math.sin(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
+        car.position.z += Math.cos(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
+        car.rotation.y = car.rotation.y % (2 * Math.PI) + THREE.Math.degToRad(car_stats.angle)  * car_stats.speed;
 	
 	
 	
@@ -357,13 +383,15 @@ function animate() {
 			var collisionResults = ray.intersectObjects( collidable );
 			// Si y'a collision
 			if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() && mov[KeyBindings.forward.code] ){
-				//console.log(collisionResults)
-				//console.log(directionVector)
+				console.log(collisionResults)
+				console.log(directionVector)
 				let v = new THREE.Vector2(directionVector.x,directionVector.z)
 
 				car_stats.speed=0
 
-				car_stats.steerAngle.current=v.angle()//+THREE.Math.degToRad(90)
+				console.log(v.angle())
+				fleche.rotation.y=v.angle()//+THREE.Math.degToRad(90)
+				car.rotation.y += Math.abs(v.angle()/100)
 			}
 			
 
@@ -389,7 +417,7 @@ function animate() {
 
 
 
-		touch_cube();
+		//touch_cube();
 
 if(mine)
 	if(touch_mine()){
@@ -408,8 +436,8 @@ if(mine)
 	}
 	k+=up.getDelta()
 		
-	if(k>0.1){
-		socket.emit('move',car.position.x,car.position.z,car.rotation.y)
+	if(k>0.05){
+		socket.emit('move',car.position.x,car.position.z,car.rotation.y-THREE.Math.degToRad(90))
 		k=0
 	}
 	
@@ -430,8 +458,8 @@ if(mine)
 function isCorrect(){
 	// on calcule la prochaine position
 	let r = true;
-	let x =car.position.x + Math.sin(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
-	let z =car.position.x + Math.cos(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
+	let x =car.position.x + Math.sin(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
+	let z =car.position.x + Math.cos(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
 	bordermap.forEach( border => {
 		let tmp = new THREE.Box3()
 		tmp.setFromObject(border)
@@ -441,9 +469,9 @@ function isCorrect(){
 	if(!r){
 		car_stats.speed /= 2
 
-		car.position.x += Math.sin(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
-        car.position.z += Math.cos(car.rotation.y + car_stats.steerAngle.toR()) * car_stats.speed ;
-       // car.rotation.y = THREE.Math.degToRad(90) // car.rotation.y % (2 * Math.PI) + car_stats.steerAngle.toR() * car_stats.speed;
+		car.position.x += Math.sin(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
+        car.position.z += Math.cos(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
+       // car.rotation.y = THREE.Math.degToRad(90) // car.rotation.y % (2 * Math.PI) + THREE.Math.degToRad(car_stats.angle)  * car_stats.speed;
 	}
 		
 
@@ -467,6 +495,7 @@ MTLLoader.load( 'ressources/Low_Poly_Sportcar.mtl',
 				obj.getObjectByName('Disc').visible = false
 				obj.getObjectByName("Car").material[1].color.set(colord);
 				obj.scale.set( 0.008, 0.008, 0.008);
+				obj.opacity = 0.2;
 				tmp.add(obj);
 			}
 		);
@@ -535,17 +564,15 @@ function restart(){
 document.querySelector('#log').addEventListener('submit', event => {
 	event.preventDefault();
 
-	let server =document.querySelector('.card.border-success').id
+	server=document.querySelector('.card.border-success').id
 
 		socket=io();
 		socket.emit('player', pseudo.value,clr.value.replace('#','0x'),server)
-		socket.on('cl', m => console.log(m))
-		//socket.emit('player', pseudo.value,clr.value.replace('#','0x'))
 
 		socket.on('new', (id,name,color)=>{
 			if(f){
 				console.log('i init here')
-				init(color,server);
+				init(color);
 				animate()
 				init_control();
 				f=false;
@@ -567,6 +594,7 @@ document.querySelector('#log').addEventListener('submit', event => {
 		socket.on('remove' , id => {
 			scene.remove(scene.getObjectByName(id));
 			document.querySelector('#user_'+id).remove();
+			other.splice(other.indexOf(id),1)
 		  })
 		document.querySelector('.container').remove();
 	

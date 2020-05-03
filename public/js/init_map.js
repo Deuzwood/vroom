@@ -25,8 +25,9 @@ function init() {
     
 
     //Light
-	var spotLight = new THREE.SpotLight( {color:0xffffff,intensity:2,distance:200} );
-	spotLight.position.set( 0, 180, 0 );
+    var spotLight = new THREE.SpotLight( {color:0xffffff,intensity:2,distance:200} );
+    spotLight.angle = Math.PI/2.8
+	spotLight.position.set( 0, 200, 0 );
 	scene.add( spotLight );
 	
 	var spotLightHelper = new THREE.SpotLightHelper( spotLight );
