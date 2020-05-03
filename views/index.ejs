@@ -27,13 +27,13 @@
 
         <div class="form-group">
             <label for="map">Sélectionnez une carte : </label>
-            <div class="row"> 
+            <div class="row row-cols-5"> 
 
                 <script> 
-                for(let i=1;i<5;i++){
+                for(let i=1;i<=5;i++){
 
                     let col = document.createElement('div');
-                    col.classList = 'col-sm-3'
+                    col.classList = 'col'
 
                     let card = document.createElement('div');
                     card.id = 'server'+i;
@@ -135,6 +135,8 @@
         
         <span class="btn btn-outline-secondary" id="key_respawn"></span> pour respawn au dernier checkpoints<br>
         <span class="btn btn-outline-secondary" id="key_restart"></span> pour recommencer à zero<br>
+
+        <span class="btn btn-outline-secondary" id="key_players"></span> pour afficher les autres joueurs<br>
       </p>
       </div>
       <div class="modal-footer">
