@@ -25,6 +25,14 @@ switch (last) {
 		]
 		break;
 	case 'bezier':
+		value = [
+			new Segment('road', 'bezier',new THREE.Vector3(0,0,0), [0,100,20]),
+			new Segment('road', 'bezier',new THREE.Vector3(0,0,20), [0,50,20]),
+			new Segment('road', 'bezier',new THREE.Vector3(0,0,-40), [0,100,-20]),
+			new Segment('road', 'bezier',new THREE.Vector3(0,0,60), [0,40,15]),
+			new Segment('road', 'bezier',new THREE.Vector3(-50,0,-100), [3,200,40]),
+			new Segment('road', 'bezier',new THREE.Vector3(-20,0,80), [1,100,-20]),
+		]
 		break;
 
 	case 'boost':
@@ -41,7 +49,7 @@ switch (last) {
 		new Segment('road', 'cp',new THREE.Vector3(20,0,0), [new THREE.Vector3(30,0,0),1]),
 		new Segment('road', 'cp',new THREE.Vector3(50,0,0), [new THREE.Vector3(60,0,0),2]),
 	]
-	break;
+		break;
 
 	default:
 		break;
