@@ -4,7 +4,7 @@ let geometry
 let first=true;
 let test_noise;
 let gen;
-function terrain(min,max,lac=false){
+function terrain(lac=false){
 
     map = new THREE.Box3(new THREE.Vector3(20,0,20), new THREE.Vector3(40,4,40))
 //var maph = new THREE.Box3Helper( map, 0xffff00 );
@@ -76,15 +76,7 @@ const SIZE_PLUS = 100
           
     }
 
-    /*for(let i=geometry_w.vertices.length-1;i>0;i--){
-        geometry_w.vertices[i].y=Math.random()
-        
-    }*/
     geometry.faces.forEach( (f,i)=>{
-        /*if(f.normal.y==1)
-            f.color.set(0x33ccff)
-        else
-            f.color.set(0x3f4f44)*/
             const a = geometry.vertices[f.a]
             const b = geometry.vertices[f.b]
             const c = geometry.vertices[f.c]
@@ -94,10 +86,9 @@ const SIZE_PLUS = 100
                 box.min.y=-5
                 box.max.y=20
                 if( box.containsPoint(a) || box.containsPoint(b) || box.containsPoint(c)){
-                   geometry.vertices[f.a].y=-0.2
-                    geometry.vertices[f.b].y=-0.2
-                    geometry.vertices[f.c].y=-0.2
-                   
+                    a.y=-0.2
+                    b.y=-0.2
+                    c.y=-0.2
                 }
             })
             const max = Math.max(a.y,Math.max(b.y,c.y))
