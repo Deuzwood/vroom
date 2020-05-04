@@ -159,7 +159,7 @@ class Segment {
 			else f.color.set( CLR_GROUND)
 		} )
 
-        material = new THREE.MeshPhongMaterial({ vertexColors: THREE.VertexColors,});
+        material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors,});
 		let ground = new THREE.Mesh(geometry , material)
 
 		ground.rotation.x= THREE.Math.degToRad(-90);
@@ -225,8 +225,20 @@ class Segment {
 		/* ground */
 		geometry = new THREE.PlaneGeometry( W_ROAD, length )
 
-		let clr_ground = this.number ? CLR_GROUND : 0xff0000 
-        material = new THREE.MeshPhongMaterial({ color : clr_ground});
+		//let clr_ground = this.number ? CLR_GROUND : 0xff0000 
+		if(!this.number){
+			let geometry = new THREE.PlaneGeometry(2,W_ROAD-1, 4 , (W_ROAD-1)*2)
+			geometry.faces.forEach( (f,i) => f.color.set( ( (i+parseInt(i/4))%4==0 || (i+1*( i%2 ? 1 : -1)+parseInt(i/4))%4==0 ) ? 0x000000 : 0xffffff) )
+			let material = new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors});
+
+			let mesh = new THREE.Mesh(geometry , material)
+			mesh.rotation.x= -THREE.Math.degToRad(90)
+			mesh.rotation.z= THREE.Math.degToRad(90)
+			mesh.position.y+=0.01
+			road.add(mesh)
+		}
+
+        material = new THREE.MeshPhongMaterial({ color : CLR_GROUND});
 		let ground = new THREE.Mesh(geometry , material)
 
 		ground.rotation.x= THREE.Math.degToRad(-90);
