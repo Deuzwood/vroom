@@ -21,21 +21,7 @@
   
 </body>
 
-
-
-<script src="/three.js-dev/three.js"></script>
-<script src="/three.js-dev/OrbitControls.js"></script>
-<script src="/js/stats.js"></script>
-
-<script src="/js/const.js"></script>
-<script src="/js/Environnement.js"></script>
-
-<script src="/js/init_map.js"></script>
-<script src="/js/Segment.js"></script>
-<script src="/js/Map.js"></script>
-
-<script src="/js/const_map.js"></script>
-
+<%- include('inc/list_script'); %>
 
 <script>
 
@@ -127,6 +113,10 @@ let map;
                     break;
                 case 4:
                     render_(map_4)
+                    this.echo('Loading...');
+                    break;
+                case 5:
+                    render_(map_5)
                     this.echo('Loading...');
                     break;
                 
