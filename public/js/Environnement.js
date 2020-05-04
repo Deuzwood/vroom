@@ -143,6 +143,11 @@ function bush(x,y,z,r=false){
         scene.add(bush);
 }
 
+/**
+ * Fonction qui genere un amat de buisson et arbres
+ * @param {THREE.Vector3} pos - Position du centre
+ * @param {number} radius - Rayon 
+ */
 function forest(pos, radius){
     let forest = new THREE.Object3D();
     let density = 1/20;
