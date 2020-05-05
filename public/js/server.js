@@ -27,7 +27,6 @@ document.querySelector('#log').addEventListener('submit', event => {
 
     socket.on('new', (id,name,color)=>{
         if(f){
-            console.log('i init here')
             init(color);
             animate();
             init_control();
@@ -45,6 +44,13 @@ document.querySelector('#log').addEventListener('submit', event => {
         document.querySelector('#stats').classList = 'stats';
         document.querySelector('#main_gui').classList = '';
     }) 
+
+    // Quand on recoit move , on update les pos des joueurs
+    socket.on('move' , (id,x,z,r_y) => { 
+        scene.getObjectByName(id).position.x=x;
+        scene.getObjectByName(id).position.z=z
+        scene.getObjectByName(id).rotation.y=r_y 
+    })
 
     // Si le server nous demande de retirer un joueur
     socket.on('remove' , id => {
