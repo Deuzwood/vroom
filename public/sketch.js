@@ -2,16 +2,15 @@ var camera, scene, renderer;
 var car = new THREE.Object3D();
 
 var other = []
-let boxs = []
-let vec;
+var boxs = []
+var vec;
 var size_grid = 100;
 var divisions = 10;
 var cam = 1;
-let mov = {};
-let f = true;
-let speed = 0;
+var mov = {};
+var f = true;
 var socket;
-let server;
+var server;
 
 /* Notre voiture (stats) */
 car_stats = {
@@ -22,18 +21,19 @@ car_stats = {
 	maxSpeed_boost : 1.8,
     maxBack : 0.30,
 
-	rotation : 2,
+	rotation : 2, // max
 	inc : 0.2,
 	angle : 0,
 }
 
+// Debug
 var fleche;
 
 /* Pour nos stat et cp */
-let checkpoints = []
-let inc=0;
-let times = [];
-let clock = new THREE.Clock();
+var checkpoints = []
+var inc=0;
+var times = [];
+var clock = new THREE.Clock();
 clock.start();
 
 
@@ -57,17 +57,17 @@ let KeyBindings = {
  */
 
 Object.keys(KeyBindings).forEach( key => {
-	document.querySelector('#key_'+key).innerText = (KeyBindings[key].key).toUpperCase().replace("ArrownUp","Fleche Haut").replace("ArrownDown","Fleche Bas")
+	document.querySelector('#key_'+key).innerText = (KeyBindings[key].key).toUpperCase().replace('ARROW', 'ARROW ')
 	document.querySelector('#key_'+key).addEventListener('click' , event => {
 		document.querySelector('#key_'+key).classList = "btn btn-outline-warning";
 		document.querySelector('#key_'+key).innerText = "Appuyer sur une touche ";
 		 let change = event => { 
-			document.querySelector('#key_'+key).innerText = event.key.toUpperCase();
+			document.querySelector('#key_'+key).innerText = event.key.toUpperCase().replace('ARROW', 'ARROW ');
 
 			/*Object.keys(KeyBindings).forEach( k => {
 				if(KeyBindings[k].code == event.code){
-					document.querySelector('#key_'+k).classList = "border border-danger";
-					document.querySelector('#key_'+key).classList = "border border-danger";
+					document.querySelector('#key_'+k).classList = "btn btn-outline-danger";
+					document.querySelector('#key_'+key).classList = "btn btn-outline-danger";
 					console.log(key+' '+k)
 				}
 			})*/
@@ -80,12 +80,7 @@ Object.keys(KeyBindings).forEach( key => {
 	})
 })
 
-/* check support gamepads 
-// Pas implementer pour le moment
-*/
-function supportsGamepads() {
-    return !!(navigator.getGamepads);
-}
+
 
 function init(color=0x000000) {
 	let colord = color
@@ -101,6 +96,7 @@ function init(color=0x000000) {
 
 	var spotLight = new THREE.SpotLight( {color:0xffffff,intensity:2,distance:200} );
 	spotLight.position.set( 0, 180, 0 );
+	spotLight.castShadow = true;
 	scene.add( spotLight );
 	
 
@@ -118,7 +114,7 @@ MTLLoader.load( 'ressources/Low_Poly_Sportcar.mtl',
 		OBJLoader.setMaterials( materials );
 		OBJLoader.load( 'ressources/Low_Poly_Sportcar.obj',
 			function (object) {
-				object.children.pop()//on retire le disc
+				object.children.pop()//on retire le 'disc'
 				object.scale.set( 0.008, 0.008, 0.008);
 				object.rotation.y = -THREE.Math.degToRad(90)
 				object.castShadow = true;
@@ -137,32 +133,18 @@ geometry.vertices.push(
 	new THREE.Vector3(  0, 0, -2 )
 );
 
+/* DEBUG
 geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
 geometry.computeBoundingSphere();
 fleche = new THREE.Mesh(geometry , new THREE.MeshBasicMaterial({color : 0xff00ff, side:THREE.DoubleSide}))
 
-scene.add(fleche)
-
-
-
-/*
-test.forEach( (element,i) => {
-	console.log(element)
-	console.log(element.getWorldPosition)
-	let box = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
-	boxs.push(box.setFromObject(element)); 
-
-	var helper = new THREE.Box3Helper( boxs[i], 0xffff00 );
-	scene.add( helper );
-	
-})
-console.log(boxs)
-*/
+scene.add(fleche)*/
 
 
 var cubeGeometry = new THREE.CubeGeometry(2.8,2,5.4,1,1,1);
 	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe:true } );
 	car_box = new THREE.Mesh( cubeGeometry, wireMaterial );
+	car_box.visible=false
 	scene.add( car_box );
 
 car.name = "self"
@@ -170,45 +152,79 @@ car.position.y=1;
 car.position.x=0;
 car.rotation.y+=THREE.Math.degToRad(90)
 car.add(camera)
-//car.rotation.y=THREE.Math.degToRad(180)
 scene.add(car)
 
 vec = new THREE.Box3(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0))
 scene.background = new THREE.Color(0x444444)
 
-	if(server=="server1"){
-		console.log("render server1")
+
+	if(server=='server1'){
 		carte = new Carte(map_1)
-
-	}
-	if(server=="server2"){
-		console.log("render server2")
+		carte.render()
+		terrain()
+	
+	
+		for(let i=0; i<70;i+=10){
+			tree(i,0,10)
+		}
+	
+		forest(new THREE.Vector3(-50,0,-50),10)
+	
+	}else if(server == 'server2'){
 		carte = new Carte(map_2)
-
-	}
-
-	if(server=="server3"){
-		console.log("render server3")
+		carte.render()
+		terrain()
+	
+		for(let i=0; i<70;i+=10){
+			tree(i,0,10)
+		}
+	
+		for(let i=0; i<4;i++){
+			for(let j=0;j<2;j++)
+			tree(70+10*j+(5*Math.random()),0,-20-10*i+(5*Math.random()))
+		}
+	
+		bush(70,0,10)
+		bush(80,0,10)
+		bush(75,0,15)
+		forest(new THREE.Vector3(-40,0,-140),30)
+	
+	}else if(server == 'server3'){
 		carte = new Carte(map_3)
-
+		carte.render()
+		terrain()
+	
+		forest(new THREE.Vector3(-130,0,50),50)
+		forest(new THREE.Vector3(-130-70,0,50+70),20)
+	
 	}
-	if(server=="server4"){
-		console.log("render server4")
+	else if(server == 'server4'){
 		carte = new Carte(map_4)
-
-	}
-	if(server=="server5"){
-		console.log("render server5")
+		carte.render()
+		terrain(new THREE.Box3(new THREE.Vector3(-100,-20,10), new THREE.Vector3(70,40,80)))
+	
+		forest(new THREE.Vector3(45,0,45),20)
+		forest(new THREE.Vector3(70,0,-70),10)
+	
+		forest(new THREE.Vector3(-75,0,25),15)
+	
+	}else if(server == 'server5'){
 		carte = new Carte(map_5)
-
+		carte.render()
+		terrain(new THREE.Box3(new THREE.Vector3(-120,-20,0), new THREE.Vector3(10,40,80)))
+	
+		forest(new THREE.Vector3(10,0,285),30)
+		forest(new THREE.Vector3(30,0,40),20)
+		forest(new THREE.Vector3(-130,0,40),20)
+	
 	}
 
 	/* Routine pour toutes les carte */
 	checkpoints = new Array(carte.cp.length).fill(0);
 	document.querySelector('#nb_max_tour').innerText = carte.nb_turn;
-	carte.render()
+
 	
-	terrain(new THREE.Vector3(0,0,0),new THREE.Vector3(200,0,200))
+	terrain()
 
 	/*let box = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 	var helper = new THREE.Box3Helper( box.setFromObject(scene.children[7].children[0]), 0xffff00 );
@@ -270,7 +286,7 @@ let init_control = () => document.addEventListener('keydown', (event) => {
 					scene.getObjectByName(player).visible = !scene.getObjectByName(player).visible
 				}
 			)
-			socket.off('move')
+			//socket.off('move')
 		}
 	});
 
@@ -285,229 +301,163 @@ let k=0
 let up = new THREE.Clock()
 let act_seg = 0;
 up.start()
+
+let old=100;// juste pour que la qu'a la premiere iteration on stop 
 function animate() {
 	requestAnimationFrame( animate );
 	renderer.render( scene, camera );
-/*	vec = vec.setFromObject(car)
 
-	if(boxs[0].intersectsBox(vec)){
-		console.log('intersect')
-		boxs[0]
-	}*/
+	//fleche.position.set(car.position.x,4,car.position.z)
+	stats(mov[KeyBindings.forward.code]);
+
+
+	if ( mov[KeyBindings.forward.code] ) {
+		// Si la vitesse est superieur a speedmax on reduit la vitesse , sinon on accelere jusqu'a max speed
+		car_stats.speed = car_stats.speed <= car_stats.maxSpeed ? Math.min(car_stats.maxSpeed, car_stats.speed + car_stats.acceleration) : Math.min(car_stats.maxSpeed_boost, car_stats.speed - car_stats.resistance);
+	} else if (mov[KeyBindings.backward.code]) {
+		// accelere jusqu'a maxback ( max vitesse en marche arrière)
+		car_stats.speed = Math.max(-car_stats.maxBack, car_stats.speed - car_stats.acceleration);
+	}
 	
-	/*bordermap.forEach( element => {
-		let box = new THREE.Box3();
+	if ( mov[KeyBindings.left.code] && !mov[KeyBindings.right.code]) {
+		// meme principe mais pour la rotation
+		car_stats.angle = Math.min(car_stats.rotation, car_stats.angle + car_stats.inc);
+	} 
+	if (mov[KeyBindings.right.code] && !mov[KeyBindings.left.code]) {
+		car_stats.angle = Math.max(-car_stats.rotation, car_stats.angle - car_stats.inc);
+	}
 
-		box.setFromObject(element)
+	car_stats.speed > 0 ? car_stats.speed = Math.max(0, car_stats.speed - car_stats.resistance) : car_stats.speed = Math.min(0, car_stats.speed + car_stats.resistance);
+
+	// inc est un incrément pour eviter que la rotation soit instantané
+	car_stats.angle = car_stats.angle > 0 ? Math.max(0, car_stats.angle - car_stats.inc / 2) : Math.min(0, car_stats.angle + car_stats.inc / 2);
+
+	//on gere la pos et la rotation , tout dépend de la vitesse
+	car.position.x += Math.sin(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
+	car.position.z += Math.cos(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
+	car.rotation.y = car.rotation.y % (2 * Math.PI) + THREE.Math.degToRad(car_stats.angle)  * car_stats.speed;
+
+
+	// D'après l'exemple de Lee Stemkoski sur le raycaster collision
+	// https://stemkoski.github.io/Three.js/Collision-Detection.html
+	var originPoint = car_box.position.clone();
+	for (var vertexIndex = 0; vertexIndex < car_box.geometry.vertices.length; vertexIndex++)
+	{		
+		var localVertex = car_box.geometry.vertices[vertexIndex].clone();
+		var globalVertex = localVertex.applyMatrix4( car_box.matrix );
+		var directionVector = globalVertex.sub( car_box.position );
 		
-		let helper = new THREE.Box3Helper( box, 0x0000ff );
-		scene.add( helper );
-		//test74.add(element.clone())
-	})*/
-	/*if(isPool(car.position)){
-		car.rotation.z-=0.02;
-		car.position.y-=0.02;
-
-
-		if(car.rotation.z<-0.8)
-			respawn();
-	}else{*/
-		fleche.position.set(car.position.x,4,car.position.z)
-		if ( mov[KeyBindings.forward.code] ) {
-            car_stats.speed = Math.min(car_stats.maxSpeed, car_stats.speed + car_stats.acceleration);
-        } else if (mov[KeyBindings.backward.code]) {
-            car_stats.speed = Math.max(-car_stats.maxBack, car_stats.speed - car_stats.acceleration);
-        }
-        if ( mov[KeyBindings.left.code] && !mov[KeyBindings.right.code]) {
-            car_stats.angle = Math.min(car_stats.rotation, car_stats.angle + car_stats.inc);
-        } else if (mov[KeyBindings.right.code] && !mov[KeyBindings.left.code]) {
-            car_stats.angle = Math.max(-car_stats.rotation, car_stats.angle - car_stats.inc);
-        }
-    
-        car_stats.speed > 0 ? car_stats.speed = Math.max(0, car_stats.speed - car_stats.resistance) : car_stats.speed = Math.min(0, car_stats.speed + car_stats.resistance);
-    
-        car_stats.angle = car_stats.angle > 0 ? Math.max(0, car_stats.angle - car_stats.inc / 2) : Math.min(0, car_stats.angle + car_stats.inc / 2);
-    
-        car.position.x += Math.sin(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
-        car.position.z += Math.cos(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
-        car.rotation.y = car.rotation.y % (2 * Math.PI) + THREE.Math.degToRad(car_stats.angle)  * car_stats.speed;
-	
-	
-	
-		/*if( mov['ArrowDown']){
-			if(speed<=0){
-				car.position.z += speed*Math.sin(-car.rotation.y); 
-				car.position.x += speed*Math.cos(-car.rotation.y); 
-			}
-
-
+		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+		var collisionResults = ray.intersectObjects( collidable );
+		// Si y'a collision
+		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()){
+			let v = new THREE.Vector2(directionVector.x,directionVector.z)
 			
-			speed= speed-0.05>-0.3 ? speed-0.02 : speed
-		}
-			
-		if(  (mov['ArrowUp']|| speed!=0) ){
-			if(mov['ArrowUp'])
-				speed+=(speed*50).toFixed(0) < MAX_SPEED ? 0.02 : 0;
-			car.position.z += speed*Math.sin(-car.rotation.y) ; 
-			car.position.x += speed*Math.cos(-car.rotation.y) ; 
-			
-		}else if(!isCorrect(car.position,car.rotation,1) ){speed=0}
-			
-		
-		if( mov['ArrowLeft']){
-			car.rotation.y+=0.05
-		}
-			
-		if( mov['ArrowRight'] ){
-			car.rotation.y-=0.05
-		}*/
-
-		/**Perte de vitesse  */
-		/*if(!mov['ArrowUp'] && speed>0)
-			speed= speed-0.01>0 ? speed-0.01 : 0
-		if(!mov['ArrowUp'] && speed<0)
-			speed= speed-0.01<0 ? speed+0.01 : 0*/
-
-		stats(mov[KeyBindings.forward.code]);
-
-		// D'après l'exemple de Lee Stemkoski sur le raycaster collision
-		// https://stemkoski.github.io/Three.js/Collision-Detection.html
-		var originPoint = car_box.position.clone();
-		for (var vertexIndex = 0; vertexIndex < car_box.geometry.vertices.length; vertexIndex++)
-		{		
-			var localVertex = car_box.geometry.vertices[vertexIndex].clone();
-			var globalVertex = localVertex.applyMatrix4( car_box.matrix );
-			var directionVector = globalVertex.sub( car_box.position );
-			
-			var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-			var collisionResults = ray.intersectObjects( collidable );
-			// Si y'a collision
-			if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() && mov[KeyBindings.forward.code] ){
-				console.log(collisionResults)
-				console.log(directionVector)
-				let v = new THREE.Vector2(directionVector.x,directionVector.z)
-
+			/**
+			 * Element clé pour la position
+			 * Je garde la distance avec la collision calculé précedente
+			 * Si l'ancienne est plus grand c'est mon joueur essaye de quitter la collision
+			 * càd il s'eloigne , alors je le laisse repartir
+			 * sinon je l'arrete
+			 */
+			if(old>collisionResults[0].distance)
 				car_stats.speed=0
+			old=collisionResults[0].distance
 
-				console.log(v.angle())
-				fleche.rotation.y=v.angle()//+THREE.Math.degToRad(90)
-				car.rotation.y += Math.abs(v.angle()/100)
-			}
+			console.log(v.angle())
+			//fleche.rotation.y=v.angle()//+THREE.Math.degToRad(90)
 			
 
-		}	
-		
-		// On actualise la position de notre box pour les collision ()
-		car_box.position.set(car.position.x,car.position.y,car.position.z);
-		car_box.rotation.set(car.rotation.x,car.rotation.y,car.rotation.z);
-		//
-		let inter = []
-		AABB_road.forEach( (box,i) => {
-            box.min.y=-5
-            box.max.y=20
-				if(box.intersectsBox(new THREE.Box3().setFromObject(car)) && i != act_seg){
-					if(inter.indexOf(i)==-1)
-						inter.push(i)
-				}
-		})	
-		if(carte.boost.includes(inter[0]))
-			car_stats.speed *= 1.04 
 
-	//}
+			/**
+			 * ICI DES TEST pour le wal hit
+			 * pas concluant 
+			 * mais j'ai l'idée
+			 */
+			
+			//if(v.angle()+car.rotation.y<THREE.Math.degToRad(180) && mov[KeyBindings.forward.code] && v.angle()<THREE.Math.degToRad(180) )
+			//	car.rotation.y += Math.abs(v.angle()/100 )
+			//else if(v.angle()+car.rotation.y>THREE.Math.degToRad(180) && mov[KeyBindings.forward.code] )
+			//	car.rotation.y -= Math.abs(v.angle()/100)
 
+		/*	if(car.rotation.y > THREE.Math.degToRad(50) && car.rotation.y < THREE.Math.degToRad(90) && v.angle()<THREE.Math.degToRad(90) 
+			|| (car.rotation.y < 3 && car.rotation.y < 5 && v.angle()<3) )
+				car.rotation.y += Math.abs(v.angle()/100  )
+			else if( (car.rotation.y > THREE.Math.degToRad(90) && car.rotation.y < THREE.Math.degToRad(140) && v.angle()>THREE.Math.degToRad(90) )
+			 || (car.rotation.y > 3.5 && car.rotation.y < 4.8 && v.angle()>3.5)
+			 )
+				car.rotation.y += Math.abs(v.angle()/100 )*/
 
+			/*console.log('----')
+			console.log(v.angle())
+			console.log(car.rotation.y)*/
+		}
 
-		//touch_cube();
-
-if(mine)
-	if(touch_mine()){
-		speed=0;
-		scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array.forEach( (element,index) => { scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array[index] = element*(1+Math.random())})
-		scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.needsUpdate = true;
-		if(scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array[0]>100 || scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array[0]=='-Infinity')
-			respawn();
-	}
-
-
+	}	
 	
-	if( mov['KeyX'] && item){
-		trigger_item()
-		item = false;
-	}
+	
+	// On actualise la position de notre box pour les collision ()
+	car_box.position.set(car.position.x,car.position.y,car.position.z);
+	car_box.rotation.set(car.rotation.x,car.rotation.y,car.rotation.z);
+	//
+
+	//On actualise le segment sur lequel est le joueur
+	let inter = []
+	AABB_road.forEach( (box,i) => {
+		box.min.y=-5
+		box.max.y=20
+			if(box.intersectsBox(new THREE.Box3().setFromObject(car)) && i != act_seg){
+				if(inter.indexOf(i)==-1)
+					inter.push(i)
+			}
+	})	
+
+
+	// S'il est sur un boost on lui donne un boost de vitesse
+	if(carte.boost.includes(inter[0]))
+		car_stats.speed *= 1.04 
+
+
 	k+=up.getDelta()
 		
 	if(k>0.05){
 		socket.emit('move',car.position.x,car.position.z,car.rotation.y-THREE.Math.degToRad(90))
 		k=0
 	}
-	
-		socket.on('move' , (id,x,z,r_y) => { 
-			scene.getObjectByName(id).position.x=x;
-			scene.getObjectByName(id).position.z=z
-			scene.getObjectByName(id).rotation.y=r_y 
-	})
+
 
 }
 
-/** On créer une fonction pour savoir si
- * la position est correcte 
- * ICI -> Pas la droit d'aller dans le bleu
- * Pas le droit de sortir.
- * Return un booléen
+/**
+ * Fonction qui permet d'ajouter un joueur 
+ * @param {string} id - Id socket du joueur 
+ * @param {string} color - Couleur hexa de la voiture à chargé
  */
-function isCorrect(){
-	// on calcule la prochaine position
-	let r = true;
-	let x =car.position.x + Math.sin(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
-	let z =car.position.x + Math.cos(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
-	bordermap.forEach( border => {
-		let tmp = new THREE.Box3()
-		tmp.setFromObject(border)
-		if(tmp.intersectsBox(vec))
-			r = false;
-	})
-	if(!r){
-		car_stats.speed /= 2
-
-		car.position.x += Math.sin(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
-        car.position.z += Math.cos(car.rotation.y + THREE.Math.degToRad(car_stats.angle) ) * car_stats.speed ;
-       // car.rotation.y = THREE.Math.degToRad(90) // car.rotation.y % (2 * Math.PI) + THREE.Math.degToRad(car_stats.angle)  * car_stats.speed;
-	}
-		
-
-
-	return r;
-}
-
-
-
 function newCar(id,color) {
 	let colord=parseInt(color)
 	var tmp = new THREE.Object3D();
 	var MTLLoader = new THREE.MTLLoader( );
-MTLLoader.load( 'ressources/Low_Poly_Sportcar.mtl', 
-	function (materials) {
-		materials.preload();
-		var OBJLoader = new THREE.OBJLoader( );
-		OBJLoader.setMaterials( materials );
-		OBJLoader.load( 'ressources/Low_Poly_Sportcar.obj',
-			function (obj) {
-				obj.getObjectByName('Disc').visible = false
-				obj.getObjectByName("Car").material[1].color.set(colord);
-				obj.scale.set( 0.008, 0.008, 0.008);
-				obj.opacity = 0.2;
-				tmp.add(obj);
-			}
-		);
-	}
-);
+	MTLLoader.load( 'ressources/Low_Poly_Sportcar.mtl', 
+		function (materials) {
+			materials.preload();
+			var OBJLoader = new THREE.OBJLoader( );
+			OBJLoader.setMaterials( materials );
+			OBJLoader.load( 'ressources/Low_Poly_Sportcar.obj',
+				function (obj) {
+					obj.children.pop() // remove disc
+					obj.getObjectByName("Car").material[1].color.set(colord);
+					obj.scale.set( 0.008, 0.008, 0.008);
+					obj.children.forEach( child => child.material.forEach( m =>{ m.opacity=0.2;m.transparent=true;console.log(m.opacity)}) )
+					tmp.add(obj);
+				}
+			);
+		}
+	);
 
-tmp.name = id;
-tmp.position.y=1;
-tmp.position.x=45;
-tmp.rotation.y-=1.57
-other.push(id)
-scene.add(tmp)
+	tmp.name = id;
+	tmp.position.y=1;
+	other.push(id)
+	scene.add(tmp)
 
 }
 
@@ -522,9 +472,8 @@ function isPool(position){
  */
 function respawn(){
 	let i = checkpoints.lastIndexOf(1) == -1 ? 0 : checkpoints.lastIndexOf(1) ;
-	console.log('respawn called')
 
-	car.position.y=2;
+	car.position.y=1;
 	car.position.x=carte.checkpoints[i].x;
 	car.position.z=carte.checkpoints[i].z
 	//On applique la rotation du cp pour être 'face' au cp
@@ -558,56 +507,9 @@ function restart(){
 }
 
 
-
-
-/* LOG */
-document.querySelector('#log').addEventListener('submit', event => {
-	event.preventDefault();
-
-	server=document.querySelector('.card.border-success').id
-
-		socket=io();
-		socket.emit('player', pseudo.value,clr.value.replace('#','0x'),server)
-
-		socket.on('new', (id,name,color)=>{
-			if(f){
-				console.log('i init here')
-				init(color);
-				animate()
-				init_control();
-				f=false;
-			}
-			else{
-				newCar(id,color)
-			}
-			let li = document.createElement('li')
-			li.textContent = name
-			li.id='user_'+id
-			li.style = "color:"+color.replace("0x",'#')
-			document.querySelector('#list_user').appendChild(li);
-			document.querySelector('#gui').classList = 'gui';
-			document.querySelector('#stats').classList = 'stats';
-			document.querySelector('#main_gui').classList = '';
-		;
-		}) 
-	
-		socket.on('remove' , id => {
-			scene.remove(scene.getObjectByName(id));
-			document.querySelector('#user_'+id).remove();
-			other.splice(other.indexOf(id),1)
-		  })
-		document.querySelector('.container').remove();
-	
-	
-  })
-
-
-
-
-
 /**
  * On actualise nos stats
- * Ici pas de Dat.gui que du js 
+ * Ici pas de Dat.gui 
  * On pourra modifier notre gui plus simplement
  *
  */
@@ -623,34 +525,56 @@ function stats(up=0){
 	/* cp*/
 	vec = vec.setFromObject(car)
 	carte.cp.forEach( w => {
-		if(w.intersectsBox(vec)){
+		// on touche un cp et qu'il est soit le cp 0 ou un cp dont le précendent est à 1 alors on est dans le bon sens
+		if(w.intersectsBox(vec) && ((checkpoints[w.number_cp-1]==1 && w.number_cp!=0) || w.number_cp==0) ){
 			checkpoints[w.number_cp]=1
 		}
 	})
-	/*TODO put last to 0.5  if reverse*/
-
 
 
 	// si deux checkpoint && on est de retour au premier
-	if(checkpoints.indexOf(0) == -1 && carte.cp[0].intersectsBox(vec))//Si  tout les checkpoints sont passé , alors on a bien fait un tour
+	if(checkpoints.indexOf(0) == -1 && carte.cp[0].intersectsBox(vec))//Si  tout les checkpoints sont passé et qu'on est au depart , alors on a bien fait un tour
 	{
 		checkpoints = new Array(carte.cp.length).fill(0);
 		let last = clock.getDelta().toFixed(3)
-		
+
+		// Actualise tous les stats
 		document.querySelector('#nbtour').innerText = parseInt(document.querySelector('#nbtour').innerText)+1;
 		document.querySelector('#last_time').innerText = parseFloat(last).toFixed(2)+' sec';
 		times.push(last)
 		document.querySelector('#best_time').innerText = Math.min(...times).toFixed(2)
 
 		if(parseInt(document.querySelector('#nbtour').innerText) == carte.nb_turn){
-			speed=0
+			car_stats.speed=0;
 			const arrSum = arr => arr.reduce((a,b) => parseFloat(a) + parseFloat(b), 0)
-			console.log('Finish with a time of '+arrSum(times).toFixed(2)+'with a best tour'+ Math.min(...times))
+			console.log('Time '+arrSum(times).toFixed(2)+' - '+ Math.min(...times))
 		}
 	}
 		
 
 }
+
+
+
+
+
+/**
+ * A PARTIR D'ICI
+ * Le code n'est pas utiliser
+ * Mais à exister dans une précedente version
+ * 
+ * On peux faire spawn une boite 
+ * On peut la rammasser
+ * 
+ * On peut avoir un item 'mine'
+ * 
+ * Lorsque que le joueur est dessus on fait une petit animation de désintegration
+ * avec vertices+=...
+ * 
+ * Comme le lapin du TP2
+ */
+
+
 
 let box = new THREE.Group();
 box.name='box';
@@ -687,10 +611,7 @@ function touch_cube(){
 }
 
 
-/* Green 
-/* Champipi
-/* banana
-*/
+
 let it = new THREE.Group();
 let mine=false;
 function trigger_item(){
@@ -725,4 +646,25 @@ function touch_mine(){
 	return true;
 	}
 		
+}
+
+		//touch_cube();
+/* from main
+if(mine)
+	if(touch_mine()){
+		speed=0;
+		scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array.forEach( (element,index) => { scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array[index] = element*(1+Math.random())})
+		scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.needsUpdate = true;
+		if(scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array[0]>100 || scene.getObjectByName('self').children[1].children[0].geometry.attributes.position.array[0]=='-Infinity')
+			respawn();
+	}
+
+*/
+
+
+/* check support gamepads 
+// Pas implementer pour le moment
+*/
+function supportsGamepads() {
+    return !!(navigator.getGamepads);
 }
