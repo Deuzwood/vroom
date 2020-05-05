@@ -6,13 +6,10 @@ let test_noise;
 let gen;
 function terrain(lac=false){
 
-    map = new THREE.Box3(new THREE.Vector3(20,0,20), new THREE.Vector3(40,4,40))
+    map = new THREE.Box3(new THREE.Vector3(0,0,0), new THREE.Vector3(200,4,200))
 //var maph = new THREE.Box3Helper( map, 0xffff00 );
 //scene.add( maph );
 
-
-
-box = map;
 
 const SIZE_PLUS = 100
  
@@ -28,8 +25,8 @@ const SIZE_PLUS = 100
         //scene.add( helper );
 
     if(lac){
-        var lac_helper = new THREE.Box3Helper( lac, 0xffff00 );
-        scene.add( lac_helper );
+        //var lac_helper = new THREE.Box3Helper( lac, 0xffff00 );
+        //scene.add( lac_helper );
 
         geometry_w = new THREE.PlaneGeometry( gen.max.x-gen.min.x+SIZE_PLUS, gen.max.z-gen.min.z+SIZE_PLUS, (gen.max.x-gen.min.x+SIZE_PLUS)/10 , (gen.max.z-gen.min.z+SIZE_PLUS)/10 );
         geometry_w.rotateX(THREE.Math.degToRad(-90))

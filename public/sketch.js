@@ -97,6 +97,7 @@ function init(color=0x000000) {
 	var spotLight = new THREE.SpotLight( {color:0xffffff,intensity:2,distance:200} );
 	spotLight.position.set( 0, 180, 0 );
 	spotLight.castShadow = true;
+	spotLight.angle = Math.PI/2.8
 	scene.add( spotLight );
 	
 
