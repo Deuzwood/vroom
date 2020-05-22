@@ -14,8 +14,6 @@ router.get(dir+'segment:name', indexController.map);
 
 router.get(dir+'map:id', indexController.circuit);
 
-router.get(dir+'mine', indexController.mine);
-
 router.get(dir+'editor', indexController.editor);
 
 router.get(dir+'terrain:id', indexController.terrain);
