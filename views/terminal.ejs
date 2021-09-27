@@ -100,27 +100,27 @@ let value = [];
             switch (name) {
                 case 1:
                     render_(map_1)
-                    this.echo('Loading...');
+                    this.echo('Chargement...');
                     break;
                 case 2:
                     render_(map_2)
-                    this.echo('Loading...');
+                    this.echo('Chargement...');
                     break;
                 case 3:
                     render_(map_3)
-                    this.echo('Loading...');
+                    this.echo('Chargement...');
                     break;
                 case 4:
                     render_(map_4)
-                    this.echo('Loading...');
+                    this.echo('Chargement...');
                     break;
                 case 5:
                     render_(map_5)
-                    this.echo('Loading...');
+                    this.echo('Chargement...');
                     break;
                 
                 default:
-                    this.echo('Caret Undefined')
+                    this.echo('Carte non connue')
                     break;
             }
         },
@@ -137,7 +137,7 @@ let value = [];
             animate();
         },
         exit: function(){
-            window.location.replace("http://localhost:3000/test/");
+            location.replace(location.href.replace('/editor',''));
         }
     }, {
         greetings: 'Map Editor - Tapez \'help\' pour voir la liste des commandes',
